@@ -5,18 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Homagio — Homes • Materials • Budget</title>
   <meta name="description" content="Homagio helps homeowners and pros capture finishes, fixtures, and inspiration photos, link materials to rooms, track budgets, and export clean reports." />
+
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#07090d" />
 
-  <!-- ✅ Favicon + app icon (relative paths) -->
   <link rel="icon" type="image/png" href="./assets/homagio-favicon-64.png" />
   <link rel="apple-touch-icon" href="./assets/homagio-icon-256.png" />
 
-  <!-- ✅ Shared CSS (cache-busted so you SEE changes immediately) -->
-  <link rel="stylesheet" href="./assets/styles.css?v=20260219" />
+  <!-- ✅ Shared stylesheet (cache-busted) -->
+  <link rel="stylesheet" href="./assets/styles.css?v=20260219-2" />
 
-  <!-- Tiny page-specific polish only (keeps shared theme as source of truth) -->
+  <!-- ✅ VERY SMALL page-only overrides (keeps shared layer as truth) -->
   <style>
+    /* Force your logo palette even if some old CSS is leaking in */
+    :root{
+      --bg0:#06080d;
+      --bg1:#0a0f18;
+      --blue:#34a5ff;
+      --blue2:#1174fe;
+      --green:#50af6d;
+      --text:#eaf0ff;
+      --muted:#b9c6de;
+      --muted2:#8fa1c6;
+    }
+
     .hero{
       display:grid;
       grid-template-columns: 1.05fr .95fr;
@@ -24,29 +36,16 @@
       align-items:stretch;
       margin-top: 18px;
     }
-    @media (max-width: 980px){
-      .hero{ grid-template-columns: 1fr; }
-    }
+    @media (max-width: 980px){ .hero{ grid-template-columns: 1fr; } }
 
-    .hero-card{
-      padding: 18px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      min-height: 320px;
-    }
+    .hero-card{ padding: 18px; display:flex; flex-direction:column; justify-content:space-between; min-height: 320px; }
 
     .hero-badge{
-      display:inline-flex;
-      gap:10px;
-      align-items:center;
-      padding:7px 12px;
-      border-radius:999px;
+      display:inline-flex; gap:10px; align-items:center;
+      padding:7px 12px; border-radius:999px;
       border: 1px solid rgba(80,175,109,.28);
       background: rgba(80,175,109,.10);
-      color:#c9f5d6;
-      font-weight:950;
-      font-size:12px;
+      color:#c9f5d6; font-weight:950; font-size:12px;
       width:fit-content;
     }
     .hero-badge .dot{
@@ -55,32 +54,20 @@
       box-shadow: 0 0 0 6px rgba(80,175,109,.14);
     }
 
-    .hero-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top: 14px;
-    }
+    .hero-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
 
     .media-card{
-      position:relative;
-      overflow:hidden;
+      position:relative; overflow:hidden;
       border-radius: var(--radius-xl);
       border:1px solid rgba(255,255,255,.10);
       background: rgba(13,18,28,.55);
       box-shadow: var(--shadow);
       min-height: 320px;
     }
-    .media-card img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      filter: saturate(1.02) contrast(1.02);
-      opacity:.92;
-    }
+    .media-card img{ width:100%; height:100%; object-fit:cover; opacity:.92; }
+
     .media-overlay{
-      position:absolute;
-      inset:auto 12px 12px 12px;
+      position:absolute; inset:auto 12px 12px 12px;
       background: rgba(8, 12, 18, .62);
       border:1px solid rgba(255,255,255,.10);
       border-radius: 18px;
@@ -88,23 +75,14 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
-    .chip-row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-bottom:8px;
-    }
+    .chip-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
     .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:6px 10px;
-      border-radius:999px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.06);
       color: var(--muted);
-      font-size:12px;
-      font-weight:900;
+      font-size:12px; font-weight:900;
     }
     .chip .cdot{
       width:8px;height:8px;border-radius:999px;
@@ -116,61 +94,32 @@
       box-shadow: 0 0 0 5px rgba(80,175,109,.14);
     }
 
-    .section-title{
-      margin-top: 22px;
-      margin-bottom: 10px;
-    }
+    .section-title{ margin-top: 22px; margin-bottom: 10px; }
 
-    .gallery{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-    }
-    @media (max-width: 980px){
-      .gallery{ grid-template-columns: 1fr; }
-    }
+    .gallery{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 980px){ .gallery{ grid-template-columns: 1fr; } }
+
     .thumb{
-      position:relative;
-      border-radius: var(--radius-xl);
+      position:relative; border-radius: var(--radius-xl);
       border:1px solid rgba(255,255,255,.10);
       background: rgba(13,18,28,.55);
-      overflow:hidden;
-      min-height: 140px;
+      overflow:hidden; min-height: 150px;
       box-shadow: var(--shadow);
     }
-    .thumb img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      opacity:.90;
-    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; opacity:.90; }
     .thumb .tag{
-      position:absolute;
-      left: 10px;
-      bottom: 10px;
-      padding: 7px 10px;
-      border-radius: 999px;
+      position:absolute; left: 10px; bottom: 10px;
+      padding: 7px 10px; border-radius: 999px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(8,12,18,.60);
       color: var(--text);
-      font-weight:950;
-      font-size:12px;
+      font-weight:950; font-size:12px;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
-    .features{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-      margin-top: 10px;
-    }
-    @media (max-width: 980px){
-      .features{ grid-template-columns: 1fr; }
-    }
-    .fcard{
-      overflow:hidden;
-    }
+    .features{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 10px; }
+    @media (max-width: 980px){ .features{ grid-template-columns: 1fr; } }
     .fimg{
       height: 160px;
       border-radius: var(--radius-lg);
@@ -179,23 +128,12 @@
       overflow:hidden;
       margin-bottom: 12px;
     }
-    .fimg img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      opacity:.88;
-    }
-    .pill-row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top: 10px;
-    }
+    .fimg img{ width:100%; height:100%; object-fit:cover; opacity:.88; }
+    .pill-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px; }
   </style>
 </head>
 
 <body>
-  <!-- Nav -->
   <div class="nav">
     <div class="wrap nav-inner">
       <a class="brand" href="./index.html" aria-label="Homagio home">
@@ -217,15 +155,16 @@
     </div>
   </div>
 
-  <!-- Hero -->
   <div class="wrap section">
     <div class="hero">
       <div class="card hero-card">
         <div>
           <div class="hero-badge"><span class="dot"></span> Premium Home Management</div>
           <div class="sp14"></div>
+
           <h1 class="h1">Your home, beautifully organized.</h1>
           <div class="sp10"></div>
+
           <p class="p">
             Homagio helps homeowners and pros capture finishes, fixtures, and inspiration photos, link materials to rooms,
             track budgets, and export clean reports — without spreadsheet chaos.
@@ -245,9 +184,11 @@
       </div>
 
       <div class="media-card" aria-label="Hero image">
-        <!-- Keep your existing hero image if you have one.
-             If this 404s, the card will still look good (dark fallback). -->
-        <img src="./assets/hero-bedroom.jpg" alt="Bedroom inspiration" onerror="this.style.display='none';" />
+        <img
+          src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=80"
+          alt="Bedroom inspiration"
+          loading="lazy"
+        />
         <div class="media-overlay">
           <div class="chip-row">
             <div class="chip"><span class="cdot"></span> Photo → item links</div>
@@ -261,7 +202,6 @@
       </div>
     </div>
 
-    <!-- Inspiration -->
     <div id="inspiration" class="section-title">
       <div class="sp18"></div>
       <div class="h3">Inspiration that feels like home</div>
@@ -270,20 +210,31 @@
 
     <div class="gallery">
       <div class="thumb">
-        <img src="./assets/inspo-living.jpg" alt="Living spaces" onerror="this.style.display='none';" />
+        <img
+          src="https://images.unsplash.com/photo-1501183638710-841dd1904471?auto=format&fit=crop&w=1200&q=80"
+          alt="Living spaces"
+          loading="lazy"
+        />
         <div class="tag">Living spaces</div>
       </div>
       <div class="thumb">
-        <img src="./assets/inspo-work.jpg" alt="Work + design" onerror="this.style.display='none';" />
+        <img
+          src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80"
+          alt="Work + design"
+          loading="lazy"
+        />
         <div class="tag">Work + design</div>
       </div>
       <div class="thumb">
-        <img src="./assets/inspo-kitchen.jpg" alt="Exterior upgrades" onerror="this.style.display='none';" />
+        <img
+          src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=80"
+          alt="Exterior upgrades"
+          loading="lazy"
+        />
         <div class="tag">Exterior upgrades</div>
       </div>
     </div>
 
-    <!-- Features -->
     <div id="features" class="section-title">
       <div class="sp18"></div>
       <div class="h3">Features</div>
@@ -291,8 +242,14 @@
     </div>
 
     <div class="features">
-      <div class="card pad fcard">
-        <div class="fimg"><img src="./assets/feature-house.jpg" alt="House profiles" onerror="this.style.display='none';" /></div>
+      <div class="card pad">
+        <div class="fimg">
+          <img
+            src="https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1200&q=80"
+            alt="House profiles"
+            loading="lazy"
+          />
+        </div>
         <div class="item-title">House profiles</div>
         <div class="item-sub">Create multiple homes. Store style notes, addresses, budgets, and photos in one place.</div>
         <div class="pill-row">
@@ -302,18 +259,31 @@
         </div>
       </div>
 
-      <div class="card pad fcard">
-        <div class="fimg"><img src="./assets/feature-photos.jpg" alt="Photo organization" onerror="this.style.display='none';" /></div>
+      <div class="card pad">
+        <div class="fimg">
+          <img
+            src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80"
+            alt="Photos that organize materials"
+            loading="lazy"
+          />
+        </div>
         <div class="item-title">Photos that organize materials</div>
         <div class="item-sub">Link items to specific photos so you always know what tile, paint, and fixtures belong where.</div>
         <div class="pill-row">
           <span class="badge">Interior / exterior</span>
           <span class="badge blue">Photo-linked items</span>
+          <span class="badge">Purchase links</span>
         </div>
       </div>
 
-      <div class="card pad fcard">
-        <div class="fimg"><img src="./assets/feature-budget.jpg" alt="Budget clarity" onerror="this.style.display='none';" /></div>
+      <div class="card pad">
+        <div class="fimg">
+          <img
+            src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80"
+            alt="Budget clarity"
+            loading="lazy"
+          />
+        </div>
         <div class="item-title">Budget clarity</div>
         <div class="item-sub">Track total budget, spent, and remaining. Great for DIY projects and pro client workflows.</div>
         <div class="pill-row">
@@ -324,7 +294,6 @@
       </div>
     </div>
 
-    <!-- Pricing -->
     <div id="pricing" class="section-title">
       <div class="sp18"></div>
       <div class="h3">Pricing</div>
@@ -346,7 +315,6 @@
       </div>
     </div>
 
-    <!-- Support -->
     <div id="support" class="section-title">
       <div class="sp18"></div>
       <div class="h3">Support</div>
