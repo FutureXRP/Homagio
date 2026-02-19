@@ -103,7 +103,7 @@ a{color:inherit;text-decoration:none}
   display:block;
 }
 
-/* ✅ FIXED: remove width:100% !important; (it fights right: var(--panelW) on desktop) */
+/* Map */
 #map{
   position:absolute;
   top:0; left:0; right:0; bottom:0;
@@ -319,13 +319,27 @@ function safeInvalidate(){
   setTimeout(() => map && map.invalidateSize(true), 450);
 }
 
+/* ---- Robust data helpers ---- */
+function asNum(x){
+  const n = typeof x === "number" ? x : parseFloat(String(x ?? ""));
+  return Number.isFinite(n) ? n : null;
+}
+function hasPin(h){
+  const lat = asNum(h?.lat);
+  const lng = asNum(h?.lng);
+  return lat != null && lng != null && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+}
+function houseAddress(h){
+  return (h?.address?.formatted || h?.address?.raw || "").trim();
+}
+
 function initMap(){
   if (typeof L === "undefined") {
     document.getElementById('map').innerHTML = `<div style="height:100%;display:grid;place-items:center;color:#f66">Leaflet failed to load</div>`;
     return;
   }
   if (typeof HomagioDB === "undefined") {
-    document.getElementById('map').innerHTML = `<div style="height:100%;display:grid;place-items:center;color:#f66">HomagioDB failed to load (assets/db.js)</div>`;
+    document.getElementById('map').innerHTML = `<div style="height:100%;display:grid;place-items:center;color:#f66">HomagioDB failed to load (assets.db.js)</div>`;
     return;
   }
 
@@ -339,10 +353,10 @@ function initMap(){
   map.setView([DEFAULT.lat, DEFAULT.lng], DEFAULT.zoom);
   window.addEventListener('resize', safeInvalidate);
 
-  // ✅ Seed demo data near default so Demo houses exist immediately
+  // Seed demo near default so Demo houses exist
   HomagioDB.seedDemoNear(DEFAULT.lat, DEFAULT.lng, false);
 
-  // ✅ IMPORTANT: do NOT call renderHouses until map exists
+  // Do NOT render before map exists
   setRadius(2.0, { skipRender: true });
   renderHouses();
 
@@ -357,21 +371,32 @@ function setMeMarker(){
 
 function clearHouseMarkers(){
   if(!map) { houseMarkers = []; return; }
-  houseMarkers.forEach(m => {
-    try { map.removeLayer(m); } catch(e) {}
-  });
+  houseMarkers.forEach(m => { try { map.removeLayer(m); } catch(e) {} });
   houseMarkers = [];
 }
 
 function focusHouse(h){
   if(!map) return;
-  map.setView([h.lat, h.lng], 16, {animate:true});
+
+  if(!hasPin(h)){
+    const addr = houseAddress(h);
+    alert(addr ? "This house has an address but no map pin yet.\n\nOpen it in Edit mode and save a geocoded address to generate a pin." : "This house has no map location yet.");
+    return;
+  }
+
+  const lat = asNum(h.lat);
+  const lng = asNum(h.lng);
+
+  map.setView([lat, lng], 16, {animate:true});
+
   const viewUrl = `house.html?id=${encodeURIComponent(h.id)}&mode=view`;
   const editUrl = `house.html?id=${encodeURIComponent(h.id)}&mode=edit`;
-  L.popup().setLatLng([h.lat, h.lng]).setContent(`
+
+  L.popup().setLatLng([lat, lng]).setContent(`
     <div style="font-family:system-ui;min-width:200px">
       <div style="font-weight:900">${escapeHtml(h.name)}</div>
       <div style="color:#8a94ab;font-size:12px">${escapeHtml(h.style||'')} • ${escapeHtml(h.tier||'')}</div>
+      <div style="color:#8a94ab;font-size:12px;margin-top:4px">${escapeHtml(houseAddress(h) || '')}</div>
       <button onclick="window.location='${viewUrl}'" style="width:100%;margin:8px 0;padding:10px;background:#2d6cdf;color:white;border:none;border-radius:12px;cursor:pointer">View House</button>
       <button onclick="window.location='${editUrl}'" style="width:100%;padding:10px;background:rgba(255,255,255,.1);color:white;border:none;border-radius:12px;cursor:pointer">Edit (Owner)</button>
     </div>
@@ -395,16 +420,29 @@ function renderInto(container, visible){
     container.innerHTML = `<div style="padding:14px;color:var(--muted);font-size:13px">No homes in radius. Tap Demo or increase radius.</div>`;
     return;
   }
+
   visible.forEach(h => {
     const milesTxt = h.miles == null ? '—' : `${h.miles.toFixed(2)} mi`;
+    const addr = houseAddress(h);
+    const pinOk = hasPin(h);
+
     const row = document.createElement('div');
     row.className = 'row';
     row.innerHTML = `
       <div class="meta">
-        <div class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 11.2 12 5l8 6.2V20a1.6 1.6 0 0 1-1.6 1.6H5.6A1.6 1.6 0 0 1 4 20v-8.8Z" stroke="#e9eef7" stroke-width="2" stroke-linejoin="round"/></svg></div>
-        <div><b>${escapeHtml(h.name)}</b><small>${escapeHtml(h.style||'')} • Tap for details</small></div>
+        <div class="badge">${pinOk ? '🏠' : '⚠️'}</div>
+        <div>
+          <b>${escapeHtml(h.name)}</b>
+          <small>
+            ${escapeHtml(h.style||'')}
+            • ${pinOk ? 'Tap for details' : (addr ? 'Needs map pin (address saved)' : 'Needs address/pin')}
+          </small>
+        </div>
       </div>
-      <div class="right"><div class="mi">${milesTxt}</div><div class="tag">${escapeHtml(h.tier||'')}</div></div>
+      <div class="right">
+        <div class="mi">${milesTxt}</div>
+        <div class="tag">${escapeHtml(h.tier||'')}</div>
+      </div>
     `;
     row.addEventListener('click', () => focusHouse(h));
     container.appendChild(row);
@@ -412,40 +450,61 @@ function renderInto(container, visible){
 }
 
 function renderHouses(){
-  if(!map) return; // ✅ prevents early crash before initMap()
+  if(!map) return;
 
   clearHouseMarkers();
-  const houses = HomagioDB.getAllHouses();
 
-  if(!houses.length){
+  const all = HomagioDB.getAllHouses() || [];
+  if(!all.length){
     setSubline('Tap Demo to load sample homes.');
     renderInto(listSide, []);
     renderInto(listMobile, []);
     return;
   }
 
-  let visible = houses.slice();
+  // Split into pinned vs unpinned (unpinned still shows in list)
+  const pinned = [];
+  const unpinned = [];
+
+  all.forEach(h => (hasPin(h) ? pinned : unpinned).push(h));
+
+  // Compute visible based on radius (only pinned can be distance-filtered)
+  let visiblePinned = pinned.slice();
 
   if(me){
-    visible = visible
-      .map(h => ({...h, miles: haversineMiles(me.lat, me.lng, h.lat, h.lng)}))
+    visiblePinned = visiblePinned
+      .map(h => {
+        const lat = asNum(h.lat), lng = asNum(h.lng);
+        return {...h, miles: haversineMiles(me.lat, me.lng, lat, lng)};
+      })
       .filter(h => h.miles <= radiusMiles)
       .sort((a,b) => a.miles - b.miles);
+
     setSubline(`Showing homes within ${radiusMiles.toFixed(1)} miles`);
   } else {
-    visible = visible.map(h => ({...h, miles: null}));
+    visiblePinned = visiblePinned.map(h => ({...h, miles: null}));
     setSubline('Demo mode — enable GPS for real-time');
   }
 
-  visible.forEach(h => {
-    const m = L.marker([h.lat, h.lng], {icon: houseIcon})
-      .addTo(map)
-      .on('click', () => focusHouse(h));
-    houseMarkers.push(m);
+  // Add markers for pinned only
+  visiblePinned.forEach(h => {
+    const lat = asNum(h.lat);
+    const lng = asNum(h.lng);
+    try{
+      const m = L.marker([lat, lng], {icon: houseIcon})
+        .addTo(map)
+        .on('click', () => focusHouse(h));
+      houseMarkers.push(m);
+    }catch(e){
+      console.warn("Marker failed for house", h?.id, e);
+    }
   });
 
-  renderInto(listSide, visible);
-  renderInto(listMobile, visible);
+  // List shows pinned first (visible), then unpinned
+  const visibleList = [...visiblePinned, ...unpinned.map(h => ({...h, miles: null}))];
+
+  renderInto(listSide, visibleList);
+  renderInto(listMobile, visibleList);
 
   safeInvalidate();
 }
@@ -474,7 +533,7 @@ function startGps(){
   );
 }
 
-// options.skipRender is used during initMap so we can set labels without rendering too early
+// options.skipRender used during initMap
 function setRadius(v, options = {}){
   radiusMiles = v;
   radiusSide.value = radiusMobile.value = String(v);
@@ -491,6 +550,7 @@ demoBtn.addEventListener('click', () => {
   const lat = me?.lat ?? DEFAULT.lat;
   const lng = me?.lng ?? DEFAULT.lng;
 
+  // keep your existing demo reset function
   HomagioDB.resetDemo(lat, lng);
 
   setGpsStatus(!!me, me ? 'GPS on' : 'Demo');
@@ -502,7 +562,7 @@ demoBtn.addEventListener('click', () => {
   safeInvalidate();
 });
 
-// START EVERYTHING
+// START
 window.addEventListener('load', initMap);
 </script>
 </body>
