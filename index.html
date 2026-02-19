@@ -3,728 +3,364 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Homagio — Manage your home, materials, and budget</title>
-  <meta name="description" content="Homagio helps homeowners and pros track materials, photos, budgets, and export reports — all in one place." />
-  <link rel="icon" type="image/png" href="./assets/homagio-favicon-64.png" />
-  <link rel="apple-touch-icon" href="./assets/homagio-icon-256.png" />
-  <meta name="color-scheme" content="light dark" />
+  <title>Homagio — Homes • Materials • Budget</title>
+  <meta name="description" content="Homagio helps homeowners and pros capture finishes, fixtures, and inspiration photos, link materials to rooms, track budgets, and export clean reports." />
+  <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#07090d" />
 
-  <meta property="og:title" content="Homagio" />
-  <meta property="og:description" content="Manage your home, materials, and budget — all in one place." />
-  <meta property="og:type" content="website" />
+  <!-- ✅ Favicon + app icon (relative paths) -->
+  <link rel="icon" type="image/png" href="./assets/homagio-favicon-64.png" />
+  <link rel="apple-touch-icon" href="./assets/homagio-icon-256.png" />
 
+  <!-- ✅ Shared CSS (cache-busted so you SEE changes immediately) -->
+  <link rel="stylesheet" href="./assets/styles.css?v=20260219" />
+
+  <!-- Tiny page-specific polish only (keeps shared theme as source of truth) -->
   <style>
-    :root{
-      color-scheme: dark;
-
-      --bg0:#07090d;
-      --bg1:#0b0f16;
-
-      --line:rgba(255,255,255,.10);
-      --text:#eaf0ff;
-      --muted:#a9b4c7;
-
-      --blue:#2d6cdf;
-      --blue2:#1f4fb0;
-      --good:#27c7a8;
-
-      --r:22px;
-      --shadow: 0 26px 70px rgba(0,0,0,.45);
-    }
-
-    *{box-sizing:border-box}
-    html, body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background:
-        radial-gradient(1200px 650px at 20% -15%, rgba(45,108,223,.35), transparent 60%),
-        radial-gradient(900px 550px at 85% -10%, rgba(39,199,168,.22), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      color: var(--text);
-      overflow-x:hidden;
-    }
-
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1140px;margin:0 auto;padding:0 18px}
-
-    /* Top nav */
-    .top{
-      position:sticky; top:0; z-index:60;
-      backdrop-filter: blur(12px);
-      background: rgba(7,9,13,.72);
-      border-bottom: 1px solid var(--line);
-    }
-    .topInner{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:14px 0;
-      gap:14px;
-    }
-
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      min-width: 220px;
-    }
-    .logo{
-      width:36px;height:36px;border-radius:14px;
-      background:
-        radial-gradient(circle at 30% 20%, rgba(255,255,255,.22), transparent 45%),
-        linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
-      box-shadow: 0 0 0 6px rgba(45,108,223,.18), 0 18px 44px rgba(0,0,0,.50);
-      flex:0 0 auto;
-    }
-    .brandTxt{line-height:1.15}
-    .brandTxt b{display:block;font-size:14px;letter-spacing:.3px}
-    .brandTxt span{display:block;font-size:12px;color:var(--muted)}
-
-    .nav{
-      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .nav a{
-      font-size:13px;
-      color: rgba(234,240,255,.92);
-      padding:10px 10px;
-      border-radius: 12px;
-      border: 1px solid transparent;
-      transition: .15s background, .15s border, .15s transform;
-    }
-    .nav a:hover{
-      background: rgba(255,255,255,.06);
-      border-color: rgba(255,255,255,.10);
-      transform: translateY(-1px);
-    }
-
-    .btn{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius: 14px;
-      font-size:13px;
-      cursor:pointer;
-      transition:.15s transform,.15s background,.15s border, .15s box-shadow;
-      display:inline-flex; gap:8px; align-items:center; justify-content:center;
-      white-space:nowrap;
-    }
-    .btn:hover{
-      transform: translateY(-1px);
-      background: rgba(255,255,255,.10);
-      border-color: rgba(255,255,255,.16);
-    }
-    .btn.primary{
-      border:none;
-      background: linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
-      box-shadow: 0 12px 30px rgba(45,108,223,.28);
-    }
-    .btn.primary:hover{
-      box-shadow: 0 16px 38px rgba(45,108,223,.35);
-      background: linear-gradient(180deg, rgba(55,122,245,.95), rgba(31,79,176,.95));
-    }
-
-    .mobileToggle{
-      display:none;
-      padding:10px 12px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      cursor:pointer;
-    }
-    @media (max-width: 860px){
-      .navLinks{display:none}
-      .mobileToggle{display:inline-flex}
-      .nav{gap:8px}
-      .brand{min-width:auto}
-    }
-    .mobilePanel{
-      display:none;
-      border-top:1px solid var(--line);
-      padding:10px 0 14px;
-    }
-    .mobilePanel a{
-      display:block;
-      padding:12px 10px;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.04);
-      margin-top:8px;
-      font-size:13px;
-    }
-    .mobilePanel a:hover{background: rgba(255,255,255,.08)}
-
-    /* Hero */
-    .hero{padding: 54px 0 18px}
-    .heroGrid{
+    .hero{
       display:grid;
       grid-template-columns: 1.05fr .95fr;
-      gap:18px;
+      gap: 14px;
       align-items:stretch;
+      margin-top: 18px;
     }
     @media (max-width: 980px){
-      .heroGrid{grid-template-columns:1fr}
+      .hero{ grid-template-columns: 1fr; }
     }
 
-    .panel{
-      border:1px solid var(--line);
-      border-radius: var(--r);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .panelInner{padding:22px 22px 20px}
-
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      font-size:12px;
-      color: rgba(234,240,255,.92);
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.20);
-      padding:8px 10px;
-      border-radius:999px;
-    }
-    .dot{
-      width:8px;height:8px;border-radius:99px;background: rgba(39,199,168,.95);
-      box-shadow: 0 0 0 5px rgba(39,199,168,.14);
-    }
-
-    h1{
-      margin:14px 0 0;
-      font-size: 40px;
-      line-height: 1.08;
-      letter-spacing: -.4px;
-    }
-    @media (max-width: 520px){
-      h1{font-size:34px}
-    }
-    .lead{
-      margin: 12px 0 0;
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 15px;
-      max-width: 60ch;
-    }
-
-    .ctaRow{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin-top:16px;
-    }
-    .subnote{
-      margin-top: 12px;
-      color: rgba(169,180,199,.92);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    /* Warm hero image */
-    .heroShot{
-      min-height: 420px;
+    .hero-card{
+      padding: 18px;
       display:flex;
       flex-direction:column;
+      justify-content:space-between;
+      min-height: 320px;
     }
-    .heroImg{
-      position:relative;
-      flex: 1;
-      min-height: 420px;
-      background:
-        linear-gradient(180deg, rgba(7,9,13,.10), rgba(7,9,13,.85)),
-        url("https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;
-    }
-    .heroImg::after{
-      content:"";
-      position:absolute; inset:0;
-      background:
-        radial-gradient(700px 300px at 25% 20%, rgba(45,108,223,.22), transparent 60%),
-        radial-gradient(600px 280px at 85% 15%, rgba(39,199,168,.18), transparent 60%);
-      pointer-events:none;
-    }
-    .heroOverlay{
-      position:absolute; inset:0;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-end;
-      padding:18px;
+
+    .hero-badge{
+      display:inline-flex;
       gap:10px;
-    }
-    .miniPills{display:flex; gap:8px; flex-wrap:wrap}
-    .miniPill{
-      font-size:11px;
-      color: rgba(234,240,255,.92);
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.28);
-      padding:7px 10px;
-      border-radius: 999px;
-      display:inline-flex; gap:8px; align-items:center;
-    }
-    .miniPill .b{
-      width:7px;height:7px;border-radius:9px;
-      background: rgba(45,108,223,.95);
-      box-shadow:0 0 0 4px rgba(45,108,223,.14);
-    }
-    .heroCaption{
+      align-items:center;
+      padding:7px 12px;
+      border-radius:999px;
+      border: 1px solid rgba(80,175,109,.28);
+      background: rgba(80,175,109,.10);
+      color:#c9f5d6;
+      font-weight:950;
       font-size:12px;
-      color: rgba(234,240,255,.92);
-      line-height:1.4;
-      max-width: 60ch;
+      width:fit-content;
+    }
+    .hero-badge .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: linear-gradient(180deg, var(--green), rgba(80,175,109,.85));
+      box-shadow: 0 0 0 6px rgba(80,175,109,.14);
     }
 
-    /* Gallery strip */
-    .gallery{
-      padding: 12px 0 8px;
+    .hero-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 14px;
     }
-    .galleryGrid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr .8fr;
-      gap:12px;
+
+    .media-card{
+      position:relative;
+      overflow:hidden;
+      border-radius: var(--radius-xl);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(13,18,28,.55);
+      box-shadow: var(--shadow);
+      min-height: 320px;
     }
-    @media (max-width: 980px){
-      .galleryGrid{grid-template-columns:1fr}
+    .media-card img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      filter: saturate(1.02) contrast(1.02);
+      opacity:.92;
     }
-    .g{
+    .media-overlay{
+      position:absolute;
+      inset:auto 12px 12px 12px;
+      background: rgba(8, 12, 18, .62);
       border:1px solid rgba(255,255,255,.10);
       border-radius: 18px;
-      overflow:hidden;
-      background: rgba(0,0,0,.16);
-      position:relative;
-      min-height: 170px;
+      padding: 12px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    .g::after{
-      content:"";
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(7,9,13,.05), rgba(7,9,13,.75));
-      pointer-events:none;
+    .chip-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
     }
-    .g1{background: url("https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
-    .g2{background: url("https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
-    .g3{background: url("https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
-    .gLabel{
-      position:absolute; left:12px; bottom:12px; z-index:2;
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
       font-size:12px;
-      color: rgba(234,240,255,.92);
-      padding:8px 10px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.28);
-      backdrop-filter: blur(8px);
+      font-weight:900;
+    }
+    .chip .cdot{
+      width:8px;height:8px;border-radius:999px;
+      background: linear-gradient(180deg, var(--blue), var(--blue2));
+      box-shadow: 0 0 0 5px rgba(52,165,255,.16);
+    }
+    .chip.green .cdot{
+      background: linear-gradient(180deg, var(--green), rgba(80,175,109,.85));
+      box-shadow: 0 0 0 5px rgba(80,175,109,.14);
     }
 
-    /* Sections */
-    section{padding: 22px 0}
-    .sectionHd{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
+    .section-title{
+      margin-top: 22px;
+      margin-bottom: 10px;
+    }
+
+    .gallery{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 980px){
+      .gallery{ grid-template-columns: 1fr; }
+    }
+    .thumb{
+      position:relative;
+      border-radius: var(--radius-xl);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(13,18,28,.55);
+      overflow:hidden;
+      min-height: 140px;
+      box-shadow: var(--shadow);
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity:.90;
+    }
+    .thumb .tag{
+      position:absolute;
+      left: 10px;
+      bottom: 10px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(8,12,18,.60);
+      color: var(--text);
+      font-weight:950;
+      font-size:12px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .features{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 10px;
+    }
+    @media (max-width: 980px){
+      .features{ grid-template-columns: 1fr; }
+    }
+    .fcard{
+      overflow:hidden;
+    }
+    .fimg{
+      height: 160px;
+      border-radius: var(--radius-lg);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
       margin-bottom: 12px;
     }
-    .sectionHd h2{margin:0;font-size:18px;letter-spacing:.2px}
-    .sectionHd p{
-      margin:0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-      max-width: 74ch;
+    .fimg img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity:.88;
     }
-
-    .cards{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:12px;
-    }
-    @media (max-width: 980px){
-      .cards{grid-template-columns:1fr}
-    }
-
-    .card{
-      border:1px solid var(--line);
-      border-radius: var(--r);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow: 0 18px 55px rgba(0,0,0,.35);
-      overflow:hidden;
-    }
-    .cardImg{
-      height: 140px;
-      background: rgba(0,0,0,.14);
-      position:relative;
-    }
-    .cardImg::after{
-      content:"";
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(7,9,13,.05), rgba(7,9,13,.78));
-      pointer-events:none;
-    }
-    .c1{background: url("https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
-    .c2{background: url("https://images.unsplash.com/photo-1505691723518-36a5ac3b2d78?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
-    .c3{background: url("https://images.unsplash.com/photo-1582582494700-7c6c7c7b9f9a?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
-    .cardBody{padding:16px}
-    .card h3{margin:0;font-size:14px;letter-spacing:.2px}
-    .card p{margin:10px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
-    .tagRow{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
-    .tag{
-      font-size:11px;
-      color: rgba(234,240,255,.90);
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      padding:6px 10px;
-      border-radius: 999px;
-    }
-
-    /* Pricing */
-    .pricing{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    @media (max-width: 980px){
-      .pricing{grid-template-columns:1fr}
-    }
-    .priceCard{
-      border:1px solid var(--line);
-      border-radius: var(--r);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow: 0 18px 55px rgba(0,0,0,.35);
-      padding:16px;
-      position:relative;
-      overflow:hidden;
-    }
-    .priceCard.pro::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(700px 250px at 25% 0%, rgba(45,108,223,.25), transparent 60%),
-        radial-gradient(600px 260px at 90% 10%, rgba(39,199,168,.20), transparent 60%);
-      pointer-events:none;
-    }
-    .priceCard > *{position:relative}
-    .priceTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .priceTop b{font-size:14px}
-    .price{
-      margin-top:10px;
-      font-size:28px;
-      font-weight:900;
-      letter-spacing:-.3px;
-    }
-    .price small{font-size:12px;color:var(--muted);font-weight:700}
-    .ul{
-      margin:12px 0 0;
-      padding:0;
-      list-style:none;
-      color: var(--muted);
-      font-size:13px;
-      line-height:1.55;
-    }
-    .ul li{padding-left:18px; position:relative; margin-top:8px}
-    .ul li::before{
-      content:"";
-      position:absolute; left:0; top:.6em;
-      width:8px;height:8px;border-radius:10px;
-      background: rgba(39,199,168,.90);
-      box-shadow: 0 0 0 4px rgba(39,199,168,.12);
-      transform: translateY(-50%);
-    }
-
-    /* Footer */
-    .footer{
-      padding: 30px 0 38px;
-      color: rgba(169,180,199,.92);
-      font-size: 12px;
-      line-height:1.5;
-      border-top: 1px solid rgba(255,255,255,.08);
-      margin-top: 20px;
-    }
-    .footerRow{
+    .pill-row{
       display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
+      gap:8px;
       flex-wrap:wrap;
+      margin-top: 10px;
     }
-    .fine a{text-decoration:underline}
   </style>
 </head>
+
 <body>
-
-  <header class="top">
-    <div class="wrap">
-      <div class="topInner">
-        <a class="brand" href="#top" aria-label="Homagio home">
-          <div class="logo" aria-hidden="true"></div>
-          <div class="brandTxt">
-            <b>Homagio</b>
-            <span>Homes • Materials • Budget</span>
-          </div>
-        </a>
-
-        <div class="nav">
-          <div class="navLinks">
-            <a href="#features">Features</a>
-            <a href="#gallery">Inspiration</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#support">Support</a>
-          </div>
-
-          <a class="btn" href="./my.html">My Houses</a>
-          <a class="btn primary" href="./explore.html">Explore</a>
-
-          <button class="mobileToggle" id="mobileToggle" aria-label="Open menu">Menu</button>
+  <!-- Nav -->
+  <div class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="./index.html" aria-label="Homagio home">
+        <img src="./assets/homagio-logo.png" alt="Homagio" />
+        <div style="display:flex;flex-direction:column;line-height:1.05">
+          <span style="font-weight:950">Homagio</span>
+          <span class="small" style="margin-top:2px;">Homes • Materials • Budget</span>
         </div>
-      </div>
+      </a>
 
-      <div class="mobilePanel" id="mobilePanel">
-        <a href="#features">Features</a>
-        <a href="#gallery">Inspiration</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#support">Support</a>
+      <div class="nav-links">
+        <a class="link" href="#features">Features</a>
+        <a class="link" href="#inspiration">Inspiration</a>
+        <a class="link" href="#pricing">Pricing</a>
+        <a class="link" href="#support">Support</a>
+        <a class="link" href="./my.html">My Houses</a>
+        <a class="link active" href="./explore.html">Explore</a>
       </div>
     </div>
-  </header>
+  </div>
 
-  <main id="top" class="hero">
-    <div class="wrap">
-      <div class="heroGrid">
-
-        <div class="panel">
-          <div class="panelInner">
-            <div class="badge">
-              <span class="dot" aria-hidden="true"></span>
-              <span>Premium Home Management</span>
-            </div>
-
-            <h1>Your home, beautifully organized.</h1>
-            <p class="lead">
-              Homagio helps homeowners and pros capture finishes, fixtures, and inspiration photos, link materials to rooms,
-              track budgets, and export clean reports — without the spreadsheet chaos.
-            </p>
-
-            <div class="ctaRow">
-              <a class="btn primary" href="./my.html">Manage My Houses →</a>
-              <a class="btn" href="./explore.html">Explore Homes</a>
-              <a class="btn" href="#pricing">See Pricing</a>
-            </div>
-
-            <div class="subnote">
-              MVP note: this website uses localStorage for demo/testing.
-              Next: accounts + cloud sync + uploads + real exports.
-            </div>
-          </div>
-        </div>
-
-        <div class="panel heroShot" aria-label="Warm hero image">
-          <div class="heroImg">
-            <div class="heroOverlay">
-              <div class="miniPills">
-                <div class="miniPill"><span class="b" aria-hidden="true"></span>Photo → Item links</div>
-                <div class="miniPill"><span class="b" style="background:rgba(39,199,168,.95);box-shadow:0 0 0 4px rgba(39,199,168,.14)" aria-hidden="true"></span>Budget clarity</div>
-                <div class="miniPill"><span class="b" style="background:rgba(255,204,102,.95);box-shadow:0 0 0 4px rgba(255,204,102,.12)" aria-hidden="true"></span>Client-ready exports</div>
-              </div>
-              <div class="heroCaption">
-                Save what you love, track what you bought, and know exactly what goes where — even months later.
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </main>
-
-  <section id="gallery" class="gallery">
-    <div class="wrap">
-      <div class="sectionHd">
+  <!-- Hero -->
+  <div class="wrap section">
+    <div class="hero">
+      <div class="card hero-card">
         <div>
-          <h2>Inspiration that feels like home</h2>
-          <p>Warm visuals while you test the product — later these become your own saved galleries.</p>
-        </div>
-      </div>
+          <div class="hero-badge"><span class="dot"></span> Premium Home Management</div>
+          <div class="sp14"></div>
+          <h1 class="h1">Your home, beautifully organized.</h1>
+          <div class="sp10"></div>
+          <p class="p">
+            Homagio helps homeowners and pros capture finishes, fixtures, and inspiration photos, link materials to rooms,
+            track budgets, and export clean reports — without spreadsheet chaos.
+          </p>
 
-      <div class="galleryGrid">
-        <div class="g g1"><div class="gLabel">Living spaces</div></div>
-        <div class="g g2"><div class="gLabel">Work + design</div></div>
-        <div class="g g3"><div class="gLabel">Exterior upgrades</div></div>
-      </div>
-    </div>
-  </section>
+          <div class="hero-actions">
+            <a class="btn primary" href="./my.html">Manage My Houses →</a>
+            <a class="btn" href="./explore.html">Explore Homes</a>
+            <a class="btn" href="#pricing">See Pricing</a>
+          </div>
 
-  <section id="features">
-    <div class="wrap">
-      <div class="sectionHd">
-        <div>
-          <h2>Features</h2>
-          <p>Everything you need to capture materials, photos, and budgets — without a messy spreadsheet.</p>
-        </div>
-      </div>
-
-      <div class="cards">
-        <div class="card">
-          <div class="cardImg c1"></div>
-          <div class="cardBody">
-            <h3>House profiles</h3>
-            <p>Create multiple homes. Store style notes, addresses, budgets, and photos in one place.</p>
-            <div class="tagRow">
-              <span class="tag">Multi-home</span>
-              <span class="tag">Address → map pin</span>
-              <span class="tag">Quick open</span>
-            </div>
+          <div class="sp10"></div>
+          <div class="small">
+            MVP note: this website uses localStorage for demo/testing. Next: accounts + cloud sync + uploads + real exports.
           </div>
         </div>
+      </div>
 
-        <div class="card">
-          <div class="cardImg c2"></div>
-          <div class="cardBody">
-            <h3>Photos that organize materials</h3>
-            <p>Link items to specific photos so you always know what paint, tile, and fixtures belong where.</p>
-            <div class="tagRow">
-              <span class="tag">Interior / exterior</span>
-              <span class="tag">Photo-linked items</span>
-              <span class="tag">Purchase links</span>
-            </div>
+      <div class="media-card" aria-label="Hero image">
+        <!-- Keep your existing hero image if you have one.
+             If this 404s, the card will still look good (dark fallback). -->
+        <img src="./assets/hero-bedroom.jpg" alt="Bedroom inspiration" onerror="this.style.display='none';" />
+        <div class="media-overlay">
+          <div class="chip-row">
+            <div class="chip"><span class="cdot"></span> Photo → item links</div>
+            <div class="chip green"><span class="cdot"></span> Budget clarity</div>
+            <div class="chip"><span class="cdot"></span> Client-ready exports</div>
           </div>
-        </div>
-
-        <div class="card">
-          <div class="cardImg c3"></div>
-          <div class="cardBody">
-            <h3>Budget clarity</h3>
-            <p>Track total budget, spent, and remaining. Great for DIY projects and pro client workflows.</p>
-            <div class="tagRow">
-              <span class="tag">Total vs spent</span>
-              <span class="tag">Remaining</span>
-              <span class="tag">Export-ready</span>
-            </div>
+          <div class="small">
+            Save what you love, track what you bought, and know exactly what goes where — even months later.
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <section id="pricing">
-    <div class="wrap">
-      <div class="sectionHd">
-        <div>
-          <h2>Pricing</h2>
-          <p>Simple tiers now. Later we’ll wire Stripe/IAP and pro billing workflows.</p>
+    <!-- Inspiration -->
+    <div id="inspiration" class="section-title">
+      <div class="sp18"></div>
+      <div class="h3">Inspiration that feels like home</div>
+      <div class="small">Warm visuals while you test the product — later these become your own saved galleries.</div>
+    </div>
+
+    <div class="gallery">
+      <div class="thumb">
+        <img src="./assets/inspo-living.jpg" alt="Living spaces" onerror="this.style.display='none';" />
+        <div class="tag">Living spaces</div>
+      </div>
+      <div class="thumb">
+        <img src="./assets/inspo-work.jpg" alt="Work + design" onerror="this.style.display='none';" />
+        <div class="tag">Work + design</div>
+      </div>
+      <div class="thumb">
+        <img src="./assets/inspo-kitchen.jpg" alt="Exterior upgrades" onerror="this.style.display='none';" />
+        <div class="tag">Exterior upgrades</div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div id="features" class="section-title">
+      <div class="sp18"></div>
+      <div class="h3">Features</div>
+      <div class="small">Everything you need to capture materials, photos, and budgets — without a messy spreadsheet.</div>
+    </div>
+
+    <div class="features">
+      <div class="card pad fcard">
+        <div class="fimg"><img src="./assets/feature-house.jpg" alt="House profiles" onerror="this.style.display='none';" /></div>
+        <div class="item-title">House profiles</div>
+        <div class="item-sub">Create multiple homes. Store style notes, addresses, budgets, and photos in one place.</div>
+        <div class="pill-row">
+          <span class="badge">Multi-home</span>
+          <span class="badge blue">Address → map pin</span>
+          <span class="badge">Quick open</span>
         </div>
       </div>
 
-      <div class="pricing">
-        <div class="priceCard">
-          <div class="priceTop">
-            <b>Free</b>
-            <span class="tag">MVP</span>
-          </div>
-          <div class="price">$0 <small>/ month</small></div>
-          <ul class="ul">
-            <li>Up to 2 houses (planned rule)</li>
-            <li>Photo + item linking</li>
-            <li>Basic budget tracking</li>
-          </ul>
-          <div style="margin-top:14px">
-            <a class="btn" href="./my.html">Start Free</a>
-          </div>
+      <div class="card pad fcard">
+        <div class="fimg"><img src="./assets/feature-photos.jpg" alt="Photo organization" onerror="this.style.display='none';" /></div>
+        <div class="item-title">Photos that organize materials</div>
+        <div class="item-sub">Link items to specific photos so you always know what tile, paint, and fixtures belong where.</div>
+        <div class="pill-row">
+          <span class="badge">Interior / exterior</span>
+          <span class="badge blue">Photo-linked items</span>
         </div>
+      </div>
 
-        <div class="priceCard pro">
-          <div class="priceTop">
-            <b>Premium</b>
-            <span class="tag" style="border-color: rgba(39,199,168,.22)">Most popular</span>
-          </div>
-          <div class="price">$9 <small>/ month (placeholder)</small></div>
-          <ul class="ul">
-            <li>Unlimited houses</li>
-            <li>Advanced exports (PDF/CSV)</li>
-            <li>Pro workflows + client-ready reports</li>
-          </ul>
-          <div style="margin-top:14px">
-            <a class="btn primary" href="./my.html">Go Premium (later)</a>
-          </div>
+      <div class="card pad fcard">
+        <div class="fimg"><img src="./assets/feature-budget.jpg" alt="Budget clarity" onerror="this.style.display='none';" /></div>
+        <div class="item-title">Budget clarity</div>
+        <div class="item-sub">Track total budget, spent, and remaining. Great for DIY projects and pro client workflows.</div>
+        <div class="pill-row">
+          <span class="badge">Total vs spent</span>
+          <span class="badge blue">Remaining</span>
+          <span class="badge">Export-ready</span>
         </div>
       </div>
     </div>
-  </section>
 
-  <section id="support">
-    <div class="wrap">
-      <div class="sectionHd">
-        <div>
-          <h2>Support</h2>
-          <p>Right now this is a testable MVP. If something breaks, we fix it fast and keep shipping.</p>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panelInner" style="padding:18px 18px 16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-            <div>
-              <div style="font-weight:900;font-size:14px">Ready to test the flow?</div>
-              <div style="color:var(--muted);font-size:13px;margin-top:6px;line-height:1.45">
-                Create a house → add a photo URL → link an item → verify it shows in Explore + the Links panel.
-              </div>
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <a class="btn primary" href="./my.html">Create a House</a>
-              <a class="btn" href="./explore.html">Explore</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <!-- Pricing -->
+    <div id="pricing" class="section-title">
+      <div class="sp18"></div>
+      <div class="h3">Pricing</div>
+      <div class="small">For now: free MVP while we finish accounts, sharing, and exports.</div>
     </div>
-  </section>
 
-  <footer class="footer">
-    <div class="wrap">
-      <div class="footerRow">
-        <div class="fine">
-          <b style="color:rgba(234,240,255,.92)">Homagio</b><br/>
-          <span>© <span id="year"></span> • MVP website for testing</span>
-        </div>
-        <div class="fine">
-          <div>Links:</div>
-          <a href="./my.html">My Houses</a> •
-          <a href="./explore.html">Explore</a>
-        </div>
+    <div class="grid-2">
+      <div class="card pad">
+        <div class="item-title">Free (MVP)</div>
+        <div class="item-sub">LocalStorage demo, single device, core flows.</div>
+        <div class="sp10"></div>
+        <a class="btn primary" href="./my.html">Get started</a>
       </div>
-      <div style="margin-top:10px" class="fine">
-        This is a static MVP. Data is stored in your browser via localStorage (no accounts yet).
+      <div class="card pad">
+        <div class="item-title">Premium (coming)</div>
+        <div class="item-sub">Accounts + cloud sync, unlimited homes, exports, and pro workflows.</div>
+        <div class="sp10"></div>
+        <a class="btn" href="#support">Request early access</a>
       </div>
     </div>
-  </footer>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    <!-- Support -->
+    <div id="support" class="section-title">
+      <div class="sp18"></div>
+      <div class="h3">Support</div>
+      <div class="small">Tell us what you want next — we’re building this fast.</div>
+    </div>
 
-    const toggle = document.getElementById("mobileToggle");
-    const panel = document.getElementById("mobilePanel");
-    if (toggle && panel){
-      toggle.addEventListener("click", () => {
-        const open = panel.style.display === "block";
-        panel.style.display = open ? "none" : "block";
-        toggle.textContent = open ? "Menu" : "Close";
-      });
-      panel.querySelectorAll("a").forEach(a=>{
-        a.addEventListener("click", ()=>{
-          panel.style.display = "none";
-          toggle.textContent = "Menu";
-        });
-      });
-    }
+    <div class="card pad">
+      <div class="item-sub">
+        Email support + onboarding docs coming next. For now, keep notes on what breaks and what feels amazing —
+        and we’ll tighten it up.
+      </div>
+    </div>
 
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener("click", (e) => {
-        const href = a.getAttribute("href");
-        if (!href || href.length < 2) return;
-        const el = document.querySelector(href);
-        if (!el) return;
-        e.preventDefault();
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-        history.replaceState(null, "", href);
-      });
-    });
-  </script>
+    <div class="sp18"></div>
+  </div>
 </body>
 </html>
