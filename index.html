@@ -6,37 +6,27 @@
   <title>Homagio — Manage your home, materials, and budget</title>
   <meta name="description" content="Homagio helps homeowners and pros track materials, photos, budgets, and export reports — all in one place." />
 
-  <!-- Force dark UI rendering for form controls + scrollbars -->
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#07090d" />
 
-  <!-- Social preview -->
   <meta property="og:title" content="Homagio" />
   <meta property="og:description" content="Manage your home, materials, and budget — all in one place." />
   <meta property="og:type" content="website" />
 
   <style>
-    /* ------------------------------
-       Homagio — Premium Dark Landing
-       Single-file homepage
-       ------------------------------ */
-
     :root{
       color-scheme: dark;
 
       --bg0:#07090d;
       --bg1:#0b0f16;
 
-      --card:#0f1623;
       --line:rgba(255,255,255,.10);
-
       --text:#eaf0ff;
       --muted:#a9b4c7;
 
       --blue:#2d6cdf;
       --blue2:#1f4fb0;
       --good:#27c7a8;
-      --warn:#ffcc66;
 
       --r:22px;
       --shadow: 0 26px 70px rgba(0,0,0,.45);
@@ -143,14 +133,12 @@
       color: var(--text);
       cursor:pointer;
     }
-
     @media (max-width: 860px){
-      .brand{min-width:auto}
       .navLinks{display:none}
       .mobileToggle{display:inline-flex}
       .nav{gap:8px}
+      .brand{min-width:auto}
     }
-
     .mobilePanel{
       display:none;
       border-top:1px solid var(--line);
@@ -168,12 +156,10 @@
     .mobilePanel a:hover{background: rgba(255,255,255,.08)}
 
     /* Hero */
-    .hero{
-      padding: 54px 0 28px;
-    }
+    .hero{padding: 54px 0 18px}
     .heroGrid{
       display:grid;
-      grid-template-columns: 1.1fr .9fr;
+      grid-template-columns: 1.05fr .95fr;
       gap:18px;
       align-items:stretch;
     }
@@ -181,7 +167,7 @@
       .heroGrid{grid-template-columns:1fr}
     }
 
-    .heroCard{
+    .panel{
       border:1px solid var(--line);
       border-radius: var(--r);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
@@ -189,7 +175,7 @@
       overflow:hidden;
       position:relative;
     }
-    .heroCardInner{padding:22px 22px 20px}
+    .panelInner{padding:22px 22px 20px}
 
     .badge{
       display:inline-flex; align-items:center; gap:8px;
@@ -233,66 +219,43 @@
       line-height: 1.45;
     }
 
-    .kpiRow{
-      margin-top:16px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-    }
-    @media (max-width: 520px){
-      .kpiRow{grid-template-columns:1fr}
-    }
-    .kpi{
-      border:1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      padding:12px 12px;
-    }
-    .kpi .l{font-size:11px;color:var(--muted)}
-    .kpi .v{margin-top:6px;font-weight:900;font-size:14px}
-
-    /* Right preview */
-    .preview{
-      padding: 16px;
+    /* Warm hero image */
+    .heroShot{
+      min-height: 420px;
       display:flex;
       flex-direction:column;
-      gap:12px;
-      height:100%;
     }
-    .shot{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      overflow:hidden;
-      flex: 1;
-      min-height: 280px;
+    .heroImg{
       position:relative;
+      flex: 1;
+      min-height: 420px;
+      background:
+        linear-gradient(180deg, rgba(7,9,13,.10), rgba(7,9,13,.85)),
+        url("https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;
     }
-    .shot::before{
+    .heroImg::after{
       content:"";
       position:absolute; inset:0;
       background:
-        radial-gradient(600px 240px at 25% 15%, rgba(45,108,223,.20), transparent 55%),
-        radial-gradient(520px 260px at 85% 30%, rgba(39,199,168,.16), transparent 55%);
+        radial-gradient(700px 300px at 25% 20%, rgba(45,108,223,.22), transparent 60%),
+        radial-gradient(600px 280px at 85% 15%, rgba(39,199,168,.18), transparent 60%);
       pointer-events:none;
     }
-    .shotInner{
+    .heroOverlay{
       position:absolute; inset:0;
-      padding:14px;
       display:flex;
       flex-direction:column;
+      justify-content:flex-end;
+      padding:18px;
       gap:10px;
     }
-    .shotTop{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px;
-    }
+    .miniPills{display:flex; gap:8px; flex-wrap:wrap}
     .miniPill{
       font-size:11px;
-      color: rgba(234,240,255,.90);
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.20);
-      padding:6px 10px;
+      color: rgba(234,240,255,.92);
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      padding:7px 10px;
       border-radius: 999px;
       display:inline-flex; gap:8px; align-items:center;
     }
@@ -301,34 +264,55 @@
       background: rgba(45,108,223,.95);
       box-shadow:0 0 0 4px rgba(45,108,223,.14);
     }
-    .shotGrid{
-      margin-top:auto;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
+    .heroCaption{
+      font-size:12px;
+      color: rgba(234,240,255,.92);
+      line-height:1.4;
+      max-width: 60ch;
     }
-    .tile{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      border-radius: 16px;
-      padding:12px;
-      min-height: 90px;
-    }
-    .tile b{display:block;font-size:12px}
-    .tile span{display:block;margin-top:6px;font-size:11px;color:var(--muted);line-height:1.35}
 
-    .supportRow{
-      display:flex; gap:10px; flex-wrap:wrap;
+    /* Gallery strip */
+    .gallery{
+      padding: 12px 0 8px;
     }
-    .supportRow .btn{flex:1}
+    .galleryGrid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      gap:12px;
+    }
     @media (max-width: 980px){
-      .supportRow .btn{flex:unset}
+      .galleryGrid{grid-template-columns:1fr}
+    }
+    .g{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      overflow:hidden;
+      background: rgba(0,0,0,.16);
+      position:relative;
+      min-height: 170px;
+    }
+    .g::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(7,9,13,.05), rgba(7,9,13,.75));
+      pointer-events:none;
+    }
+    .g1{background: url("https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
+    .g2{background: url("https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
+    .g3{background: url("https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
+    .gLabel{
+      position:absolute; left:12px; bottom:12px; z-index:2;
+      font-size:12px;
+      color: rgba(234,240,255,.92);
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      backdrop-filter: blur(8px);
     }
 
     /* Sections */
-    section{
-      padding: 24px 0;
-    }
+    section{padding: 22px 0}
     .sectionHd{
       display:flex;
       align-items:flex-end;
@@ -337,17 +321,13 @@
       flex-wrap:wrap;
       margin-bottom: 12px;
     }
-    .sectionHd h2{
-      margin:0;
-      font-size: 18px;
-      letter-spacing:.2px;
-    }
+    .sectionHd h2{margin:0;font-size:18px;letter-spacing:.2px}
     .sectionHd p{
       margin:0;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.45;
-      max-width: 70ch;
+      max-width: 74ch;
     }
 
     .cards{
@@ -364,25 +344,26 @@
       border-radius: var(--r);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       box-shadow: 0 18px 55px rgba(0,0,0,.35);
-      padding:16px;
+      overflow:hidden;
     }
-    .card h3{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.2px;
+    .cardImg{
+      height: 140px;
+      background: rgba(0,0,0,.14);
+      position:relative;
     }
-    .card p{
-      margin:10px 0 0;
-      color: var(--muted);
-      font-size:13px;
-      line-height:1.5;
+    .cardImg::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(7,9,13,.05), rgba(7,9,13,.78));
+      pointer-events:none;
     }
-    .tagRow{
-      margin-top:12px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
+    .c1{background: url("https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
+    .c2{background: url("https://images.unsplash.com/photo-1505691723518-36a5ac3b2d78?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
+    .c3{background: url("https://images.unsplash.com/photo-1582582494700-7c6c7c7b9f9a?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;}
+    .cardBody{padding:16px}
+    .card h3{margin:0;font-size:14px;letter-spacing:.2px}
+    .card p{margin:10px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+    .tagRow{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
     .tag{
       font-size:11px;
       color: rgba(234,240,255,.90);
@@ -467,7 +448,6 @@
 </head>
 <body>
 
-  <!-- Top Nav -->
   <header class="top">
     <div class="wrap">
       <div class="topInner">
@@ -482,9 +462,8 @@
         <div class="nav">
           <div class="navLinks">
             <a href="#features">Features</a>
-            <a href="#screens">Screens</a>
+            <a href="#gallery">Inspiration</a>
             <a href="#pricing">Pricing</a>
-            <a href="#pros">For Pros</a>
             <a href="#support">Support</a>
           </div>
 
@@ -497,30 +476,28 @@
 
       <div class="mobilePanel" id="mobilePanel">
         <a href="#features">Features</a>
-        <a href="#screens">Screens</a>
+        <a href="#gallery">Inspiration</a>
         <a href="#pricing">Pricing</a>
-        <a href="#pros">For Pros</a>
         <a href="#support">Support</a>
       </div>
     </div>
   </header>
 
-  <!-- Hero -->
   <main id="top" class="hero">
     <div class="wrap">
       <div class="heroGrid">
 
-        <div class="heroCard">
-          <div class="heroCardInner">
+        <div class="panel">
+          <div class="panelInner">
             <div class="badge">
               <span class="dot" aria-hidden="true"></span>
               <span>Premium Home Management</span>
             </div>
 
-            <h1>Manage your home, materials, and budget — in one place.</h1>
+            <h1>Your home, beautifully organized.</h1>
             <p class="lead">
-              Homagio helps homeowners and pros capture every finish, fixture, and photo, track spending,
-              and export clean reports for projects, renovations, and inspiration.
+              Homagio helps homeowners and pros capture finishes, fixtures, and inspiration photos, link materials to rooms,
+              track budgets, and export clean reports — without the spreadsheet chaos.
             </p>
 
             <div class="ctaRow">
@@ -529,64 +506,24 @@
               <a class="btn" href="#pricing">See Pricing</a>
             </div>
 
-            <div class="kpiRow">
-              <div class="kpi">
-                <div class="l">Mobile-first</div>
-                <div class="v">Fast & simple</div>
-              </div>
-              <div class="kpi">
-                <div class="l">Exports</div>
-                <div class="v">PDF + CSV-ready</div>
-              </div>
-              <div class="kpi">
-                <div class="l">Premium</div>
-                <div class="v">Unlimited homes</div>
-              </div>
-            </div>
-
             <div class="subnote">
-              MVP note: this website version uses localStorage for demo/testing.
-              Next: accounts + Firebase + real uploads.
+              MVP note: this website uses localStorage for demo/testing.
+              Next: accounts + cloud sync + uploads + real exports.
             </div>
           </div>
         </div>
 
-        <div class="heroCard">
-          <div class="preview">
-            <div class="shot" aria-label="Homagio preview panel">
-              <div class="shotInner">
-                <div class="shotTop">
-                  <div class="miniPill"><span class="b" aria-hidden="true"></span>Preview</div>
-                  <div class="miniPill" style="border-color: rgba(39,199,168,.20)">
-                    <span class="b" style="background:rgba(39,199,168,.95);box-shadow:0 0 0 4px rgba(39,199,168,.14)" aria-hidden="true"></span>
-                    PREMIUM
-                  </div>
-                </div>
-
-                <div class="shotGrid">
-                  <div class="tile">
-                    <b>Photos → Items</b>
-                    <span>Tap a photo. See linked paint, flooring, fixtures, and purchase links.</span>
-                  </div>
-                  <div class="tile">
-                    <b>Budget tracking</b>
-                    <span>Track total vs spent and keep projects honest.</span>
-                  </div>
-                  <div class="tile">
-                    <b>Explore map</b>
-                    <span>See nearby homes on a live map + side panel links.</span>
-                  </div>
-                  <div class="tile">
-                    <b>Reports</b>
-                    <span>Generate clean exports for renos, listings, and client handoffs.</span>
-                  </div>
-                </div>
+        <div class="panel heroShot" aria-label="Warm hero image">
+          <div class="heroImg">
+            <div class="heroOverlay">
+              <div class="miniPills">
+                <div class="miniPill"><span class="b" aria-hidden="true"></span>Photo → Item links</div>
+                <div class="miniPill"><span class="b" style="background:rgba(39,199,168,.95);box-shadow:0 0 0 4px rgba(39,199,168,.14)" aria-hidden="true"></span>Budget clarity</div>
+                <div class="miniPill"><span class="b" style="background:rgba(255,204,102,.95);box-shadow:0 0 0 4px rgba(255,204,102,.12)" aria-hidden="true"></span>Client-ready exports</div>
               </div>
-            </div>
-
-            <div class="supportRow">
-              <a class="btn" href="#features">What it does</a>
-              <a class="btn" href="#screens">See screens</a>
+              <div class="heroCaption">
+                Save what you love, track what you bought, and know exactly what goes where — even months later.
+              </div>
             </div>
           </div>
         </div>
@@ -595,7 +532,23 @@
     </div>
   </main>
 
-  <!-- Features -->
+  <section id="gallery" class="gallery">
+    <div class="wrap">
+      <div class="sectionHd">
+        <div>
+          <h2>Inspiration that feels like home</h2>
+          <p>Warm visuals while you test the product — later these become your own saved galleries.</p>
+        </div>
+      </div>
+
+      <div class="galleryGrid">
+        <div class="g g1"><div class="gLabel">Living spaces</div></div>
+        <div class="g g2"><div class="gLabel">Work + design</div></div>
+        <div class="g g3"><div class="gLabel">Exterior upgrades</div></div>
+      </div>
+    </div>
+  </section>
+
   <section id="features">
     <div class="wrap">
       <div class="sectionHd">
@@ -607,92 +560,47 @@
 
       <div class="cards">
         <div class="card">
-          <h3>House profiles</h3>
-          <p>Create multiple homes. Store style notes, addresses, budget totals, and photos in one place.</p>
-          <div class="tagRow">
-            <span class="tag">Multi-home</span>
-            <span class="tag">Address → map pin</span>
-            <span class="tag">Quick open</span>
+          <div class="cardImg c1"></div>
+          <div class="cardBody">
+            <h3>House profiles</h3>
+            <p>Create multiple homes. Store style notes, addresses, budgets, and photos in one place.</p>
+            <div class="tagRow">
+              <span class="tag">Multi-home</span>
+              <span class="tag">Address → map pin</span>
+              <span class="tag">Quick open</span>
+            </div>
           </div>
         </div>
 
         <div class="card">
-          <h3>Photos that organize your materials</h3>
-          <p>Link items to specific photos so you always know what paint, tile, and fixtures belong where.</p>
-          <div class="tagRow">
-            <span class="tag">Interior / exterior</span>
-            <span class="tag">Photo-linked items</span>
-            <span class="tag">Purchase links</span>
+          <div class="cardImg c2"></div>
+          <div class="cardBody">
+            <h3>Photos that organize materials</h3>
+            <p>Link items to specific photos so you always know what paint, tile, and fixtures belong where.</p>
+            <div class="tagRow">
+              <span class="tag">Interior / exterior</span>
+              <span class="tag">Photo-linked items</span>
+              <span class="tag">Purchase links</span>
+            </div>
           </div>
         </div>
 
         <div class="card">
-          <h3>Budget clarity</h3>
-          <p>Track total budget, spent, and remaining. Great for DIY projects and pro client workflows.</p>
-          <div class="tagRow">
-            <span class="tag">Total vs spent</span>
-            <span class="tag">Remaining</span>
-            <span class="tag">Export-ready</span>
+          <div class="cardImg c3"></div>
+          <div class="cardBody">
+            <h3>Budget clarity</h3>
+            <p>Track total budget, spent, and remaining. Great for DIY projects and pro client workflows.</p>
+            <div class="tagRow">
+              <span class="tag">Total vs spent</span>
+              <span class="tag">Remaining</span>
+              <span class="tag">Export-ready</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Screens -->
-  <section id="screens">
-    <div class="wrap">
-      <div class="sectionHd">
-        <div>
-          <h2>Screens</h2>
-          <p>Simple flows: create a home → add photos → link items → explore on map.</p>
-        </div>
-      </div>
-
-      <div class="cards">
-        <div class="card">
-          <h3>My Houses</h3>
-          <p>Create new houses, view budgets at a glance, and jump into details instantly.</p>
-          <div class="tagRow">
-            <span class="tag">Create</span>
-            <span class="tag">List</span>
-            <span class="tag">Budget KPI</span>
-          </div>
-          <div style="margin-top:12px">
-            <a class="btn primary" href="./my.html">Open My Houses</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>House Details</h3>
-          <p>Add photo URLs (MVP), then attach items/materials with links and notes.</p>
-          <div class="tagRow">
-            <span class="tag">Photos</span>
-            <span class="tag">Items</span>
-            <span class="tag">Links</span>
-          </div>
-          <div style="margin-top:12px">
-            <a class="btn" href="./my.html">Create a house →</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Explore</h3>
-          <p>Map-based discovery with a clean side panel that shows homes and their links.</p>
-          <div class="tagRow">
-            <span class="tag">Leaflet map</span>
-            <span class="tag">Radius filter</span>
-            <span class="tag">Side panel</span>
-          </div>
-          <div style="margin-top:12px">
-            <a class="btn primary" href="./explore.html">Open Explore</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Pricing -->
   <section id="pricing">
     <div class="wrap">
       <div class="sectionHd">
@@ -738,49 +646,6 @@
     </div>
   </section>
 
-  <!-- For Pros -->
-  <section id="pros">
-    <div class="wrap">
-      <div class="sectionHd">
-        <div>
-          <h2>For Pros</h2>
-          <p>Designed for designers, builders, and realtors who need clean documentation and links that don’t get lost.</p>
-        </div>
-      </div>
-
-      <div class="cards">
-        <div class="card">
-          <h3>Client handoffs</h3>
-          <p>Export a clear materials list and photo references so clients can buy exactly what you specified.</p>
-          <div class="tagRow">
-            <span class="tag">Specs</span>
-            <span class="tag">Links</span>
-            <span class="tag">Notes</span>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Renovation tracking</h3>
-          <p>Keep budget + materials attached to proof photos. Perfect for insurance, receipts, and scope control.</p>
-          <div class="tagRow">
-            <span class="tag">Budget</span>
-            <span class="tag">Evidence</span>
-            <span class="tag">Scope</span>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Listing polish</h3>
-          <p>Maintain a record of upgrades and finishes for resale value and faster listing prep.</p>
-          <div class="tagRow">
-            <span class="tag">Upgrades</span>
-            <span class="tag">Finish library</span>
-            <span class="tag">Faster listings</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Support -->
   <section id="support">
     <div class="wrap">
       <div class="sectionHd">
@@ -790,51 +655,13 @@
         </div>
       </div>
 
-      <div class="cards">
-        <div class="card">
-          <h3>Quick start</h3>
-          <p>Open <b>My Houses</b> → create a home → add a photo URL → link an item → see it in Explore.</p>
-          <div class="tagRow">
-            <span class="tag">5 minutes</span>
-            <span class="tag">No login (MVP)</span>
-          </div>
-          <div style="margin-top:12px">
-            <a class="btn primary" href="./my.html">Go to My Houses</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Demo data</h3>
-          <p>Use the <b>Demo</b> button in Explore or My Houses to load sample homes and items for testing.</p>
-          <div class="tagRow">
-            <span class="tag">Seed data</span>
-            <span class="tag">Map-ready</span>
-          </div>
-          <div style="margin-top:12px">
-            <a class="btn" href="./explore.html">Open Explore</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Next upgrades</h3>
-          <p>Accounts, Firebase, uploads, real PDF export, pro billing, and better “screens” visuals.</p>
-          <div class="tagRow">
-            <span class="tag">Firebase</span>
-            <span class="tag">Uploads</span>
-            <span class="tag">Exports</span>
-          </div>
-        </div>
-      </div>
-
-      <div style="height:14px"></div>
-
-      <div class="heroCard" style="padding:0">
-        <div class="heroCardInner" style="padding:18px 18px 16px">
+      <div class="panel">
+        <div class="panelInner" style="padding:18px 18px 16px">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
             <div>
               <div style="font-weight:900;font-size:14px">Ready to test the flow?</div>
               <div style="color:var(--muted);font-size:13px;margin-top:6px;line-height:1.45">
-                Create a house, add a photo, link an item, then verify it shows in Explore + the Links panel.
+                Create a house → add a photo URL → link an item → verify it shows in Explore + the Links panel.
               </div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -868,10 +695,8 @@
   </footer>
 
   <script>
-    // Year
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Mobile menu
     const toggle = document.getElementById("mobileToggle");
     const panel = document.getElementById("mobilePanel");
     if (toggle && panel){
@@ -880,7 +705,6 @@
         panel.style.display = open ? "none" : "block";
         toggle.textContent = open ? "Menu" : "Close";
       });
-      // close on click
       panel.querySelectorAll("a").forEach(a=>{
         a.addEventListener("click", ()=>{
           panel.style.display = "none";
@@ -889,7 +713,6 @@
       });
     }
 
-    // Smooth scroll for in-page anchors
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener("click", (e) => {
         const href = a.getAttribute("href");
