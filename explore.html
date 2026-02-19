@@ -4,8 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Homagio — Explore</title>
-  <meta name="description" content="Explore Homagio homes nearby." />
+  <meta name="description" content="Explore nearby homes around you in real time." />
+  <meta name="color-scheme" content="light dark" />
 
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="/assets/styles.css" />
+
+  <!-- Leaflet -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -16,525 +21,568 @@
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
+    defer
   ></script>
 
-  <meta name="color-scheme" content="light dark" />
+  <!-- Shared JS -->
+  <script defer src="/assets/core.js"></script>
+  <script defer src="/assets/db.js"></script>
+  <!-- Back-compat shim (safe) -->
+  <script defer src="/assets.db.js"></script>
+
   <style>
-    :root{
-      --bg0:#07090d;
-      --bg1:#0b0f16;
-      --card:#0f1623;
-      --muted:#a9b4c7;
-      --text:#eaf0ff;
-      --line:rgba(255,255,255,.10);
-      --blue:#2d6cdf;
-      --blue2:#1f4fb0;
-      --good:#27c7a8;
-      --warn:#ffcc66;
-      --bad:#ff5577;
-      --r:18px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: linear-gradient(180deg, var(--bg0), var(--bg1));
-      color:var(--text);
-      height:100vh;
-      overflow:hidden;
-    }
-    a{color:inherit;text-decoration:none}
+    /* Explore-specific polish (kept minimal; relies on shared theme) */
 
-    .top{
-      position:sticky; top:0; z-index:40;
-      backdrop-filter: blur(10px);
-      background: rgba(7,9,13,.72);
-      border-bottom:1px solid var(--line);
-    }
-    .wrap{max-width:1400px;margin:0 auto;padding:14px 16px}
-    .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .brand{display:flex;gap:10px;align-items:center}
-    .logo{
-      width:34px;height:34px;border-radius:12px;
-      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.20), transparent 45%),
-                  linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
-      box-shadow: 0 0 0 6px rgba(45,108,223,.18), 0 18px 40px rgba(0,0,0,.45);
-    }
-    .brand h1{font-size:14px;margin:0;letter-spacing:.3px}
-    .brand p{margin:0;font-size:12px;color:var(--muted)}
-    .nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-
-    .btn{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius: 14px;
-      font-size:13px;
-      cursor:pointer;
-      transition:.15s transform,.15s background,.15s border;
-      display:inline-flex; gap:8px; align-items:center;
-    }
-    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.16)}
-    .btn.primary{
-      border:none;
-      background: linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
-      box-shadow: 0 12px 30px rgba(45,108,223,.28);
-    }
-
-    .layout{
-      display:grid;
-      grid-template-columns: 1fr 380px;
-      height: calc(100vh - 62px);
-    }
-    @media (max-width: 980px){
-      .layout{grid-template-columns: 1fr}
-      .side{position:absolute; right:10px; top:72px; width:min(92vw, 420px); height: calc(100vh - 86px); z-index:60}
-    }
-
-    #map{height:100%; width:100%}
-
-    .side{
-      border-left:1px solid var(--line);
-      background: rgba(12,16,24,.75);
-      backdrop-filter: blur(10px);
-      display:flex;
-      flex-direction:column;
-      min-height:0;
-    }
-    .panelTop{
-      padding:12px;
-      border-bottom:1px solid var(--line);
+    .topbar-actions{
       display:flex;
       gap:10px;
       align-items:center;
-      justify-content:space-between;
-    }
-    .tabs{display:flex; gap:8px}
-    .tab{
-      padding:8px 10px;
-      border-radius: 12px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      font-size:12px;
-      color: var(--muted);
-      cursor:pointer;
-    }
-    .tab.active{
-      color: var(--text);
-      border-color: rgba(45,108,223,.55);
-      background: rgba(45,108,223,.18);
-    }
-    .panelBody{
-      padding:12px;
-      overflow:auto;
-      min-height:0;
-    }
-    .mini{
-      font-size:12px;color:var(--muted);line-height:1.35
-    }
-    .homeCard{
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      border-radius: 16px;
-      padding:12px;
-      margin-bottom:10px;
-      cursor:pointer;
-    }
-    .homeCard:hover{background: rgba(0,0,0,.24); border-color: rgba(255,255,255,.16)}
-    .homeCard .name{font-weight:800}
-    .pill{
-      display:inline-flex; align-items:center; gap:6px;
-      font-size:11px; color:var(--muted);
-      border:1px solid var(--line);
-      padding:4px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.04);
-      margin-top:8px;
-    }
-    .listTitle{
-      font-weight:800;
-      margin: 0 0 10px;
-      font-size:13px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
     }
 
-    .rangeRow{
-      display:flex; gap:10px; align-items:center; margin-top:10px;
-      border:1px solid var(--line);
-      border-radius: 16px;
-      padding:10px;
-      background: rgba(255,255,255,.04);
-    }
-    input[type="range"]{width:100%}
-    .stat{
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.92);
+      font-weight:800;
       font-size:12px;
       color: var(--muted);
-      margin-left:auto;
+      user-select:none;
+    }
+    .pill b{color: var(--text)}
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(100,116,139,.45);
+      box-shadow: 0 0 0 5px rgba(100,116,139,.12);
+    }
+    .dot.on{
+      background: linear-gradient(180deg, var(--blue), var(--blue2));
+      box-shadow: 0 0 0 5px rgba(37,99,235,.14);
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      padding: 12px 14px 0;
+    }
+
+    .range{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      width:100%;
+    }
+    .range input[type="range"]{width: 220px; max-width: 60vw}
+    .range .val{
+      min-width: 64px;
+      text-align:right;
+      font-weight:900;
+      color: var(--text);
+    }
+
+    .empty{
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed rgba(15,23,42,.18);
+      background: rgba(2,6,23,.02);
+      color: var(--muted);
+      line-height:1.5;
+    }
+
+    /* Marker label */
+    .price-pin{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.18);
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 12px 26px rgba(2,6,23,.14);
+      font-weight: 900;
+      color: var(--text);
+      transform: translateY(-8px);
       white-space:nowrap;
     }
-
-    .linkItem{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      border-radius: 14px;
-      padding:10px;
-      margin-bottom:8px;
+    .price-pin .mini{
+      width:10px;height:10px;border-radius:999px;
+      background: linear-gradient(180deg, var(--blue), var(--blue2));
+      box-shadow: 0 0 0 5px rgba(37,99,235,.12);
     }
-    .linkItem a{
-      color: rgba(234,240,255,.95);
-      text-decoration: underline;
-      word-break: break-word;
+    .price-pin.sel{
+      border-color: rgba(37,99,235,.28);
+      box-shadow: 0 14px 30px rgba(37,99,235,.18);
     }
 
-    /* nicer markers */
-    .house-pin{
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.35);
-      background:
-        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.25), transparent 40%),
-        linear-gradient(180deg, rgba(45, 108, 223, 0.95), rgba(31, 79, 176, 0.95));
-      display: grid;
-      place-items: center;
-      box-shadow:
-        0 0 0 6px rgba(45, 108, 223, 0.22),
-        0 14px 34px rgba(0, 0, 0, 0.35);
+    /* Make map definitely visible */
+    #map{
+      min-height: 560px;
     }
-    .house-pin span{
-      font-weight:900;
-      font-size:12px;
-      color: rgba(255,255,255,.95);
-      transform: translateY(-.5px);
+    @media (max-width: 980px){
+      #map{ min-height: 420px; }
     }
   </style>
 </head>
+
 <body>
-  <div class="top">
-    <div class="wrap">
-      <div class="row">
-        <div class="brand">
-          <div class="logo"></div>
-          <div>
-            <h1>Homagio</h1>
-            <p>Explore nearby homes</p>
+  <!-- Top Nav -->
+  <div class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="/index.html">
+        <span class="logo-dot"></span>
+        <span>Homagio</span>
+      </a>
+
+      <div class="nav-links">
+        <a class="link" href="/index.html">Home</a>
+        <a class="link" href="/my.html">My Houses</a>
+        <a class="link active" href="/explore.html">Explore</a>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="pill" id="gpsPill">
+          <span class="dot" id="gpsDot"></span>
+          <span>GPS:</span> <b id="gpsTxt">off</b>
+        </div>
+        <button class="btn sm" id="btnGPS">Toggle GPS</button>
+        <button class="btn sm" id="btnRecenter">Recenter</button>
+        <button class="btn sm" id="btnDemo">Demo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap section" style="padding-top:18px;">
+    <div class="row" style="align-items:flex-start;">
+      <div>
+        <div class="kicker">Explore</div>
+        <div class="sp10"></div>
+        <h1 class="h2">Homes near you</h1>
+        <div class="sp10"></div>
+        <p class="p">Browse houses within your radius. Tap a marker or a home card to see details and linked items.</p>
+      </div>
+
+      <div class="card soft pad" style="max-width: 420px;">
+        <div class="h3">Radius</div>
+        <div class="sp10"></div>
+        <div class="range">
+          <input id="radius" type="range" min="0.5" max="20" step="0.5" value="2" />
+          <div class="val"><span id="radiusVal">2.0</span> mi</div>
+        </div>
+        <div class="sp10"></div>
+        <div class="small">Tip: If you see “No homes found,” hit <b>Demo</b> to seed sample homes near the map center.</div>
+      </div>
+    </div>
+
+    <div class="sp18"></div>
+
+    <!-- Zillow-ish split: map + right panel -->
+    <div class="split">
+      <div class="map-shell">
+        <div id="map"></div>
+      </div>
+
+      <div class="panel">
+        <div class="tabs">
+          <div class="tab" id="tabHomes" data-on="1">Homes</div>
+          <div class="tab" id="tabLinks" data-on="0">Links</div>
+        </div>
+
+        <div class="panel-b" id="panelHomes">
+          <div class="small muted2" style="margin-bottom:10px;">
+            Nearby homes. Tap a card or marker to select. Open full details from the card.
+          </div>
+          <div class="list" id="homesList"></div>
+          <div class="sp14"></div>
+          <div class="empty hide" id="homesEmpty">
+            <b>No homes found in range.</b><br/>
+            Increase radius or click <b>Demo</b> to load sample homes.
           </div>
         </div>
 
-        <div class="nav">
-          <a class="btn" href="./index.html">Home</a>
-          <a class="btn" href="./my.html">My Houses</a>
-          <button class="btn" id="btnGPS">GPS off</button>
-          <button class="btn" id="btnRecenter">Recenter</button>
-          <button class="btn primary" id="btnDemo">Demo</button>
+        <div class="panel-b hide" id="panelLinks">
+          <div class="small muted2" style="margin-bottom:10px;">
+            Links for the selected home (materials, items, purchase links).
+          </div>
+          <div class="empty" id="linksEmpty">
+            <b>No home selected.</b><br/>
+            Select a home to see its linked items.
+          </div>
+          <div class="list hide" id="linksList"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="layout">
-    <div id="map"></div>
-
-    <aside class="side">
-      <div class="panelTop">
-        <div class="tabs">
-          <div class="tab active" id="tabHomes">Homes</div>
-          <div class="tab" id="tabLinks">Links</div>
-        </div>
-        <div class="mini" id="gpsStatus">GPS: off</div>
-      </div>
-
-      <div class="panelBody">
-        <div id="panelHomes">
-          <div class="mini">Homes near you. Tap a home card or marker to open details.</div>
-
-          <div class="rangeRow">
-            <div class="mini" style="min-width:56px">Radius</div>
-            <input id="radius" type="range" min="1" max="25" step="1" value="2" />
-            <div class="stat" id="radiusLabel">2 mi</div>
-          </div>
-
-          <div style="height:12px"></div>
-          <div class="listTitle" id="homesTitle">Nearby</div>
-          <div id="homes"></div>
-          <div id="homesEmpty" class="mini" style="display:none;margin-top:10px">
-            No homes found in range. Tap <b>Demo</b> to load sample homes.
-          </div>
-        </div>
-
-        <div id="panelLinks" style="display:none">
-          <div class="mini">Links for the selected home (materials, items, purchase links).</div>
-          <div style="height:12px"></div>
-          <div class="listTitle" id="linksTitle">No home selected</div>
-          <div id="links"></div>
-          <div id="linksEmpty" class="mini" style="display:block;margin-top:10px">
-            Select a home to see its linked items.
-          </div>
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <script src="./assets/db.js"></script>
   <script>
-    const DEFAULT = { lat: 36.1540, lng: -95.9928, zoom: 12 }; // Tulsa-ish default
-    const $ = (id) => document.getElementById(id);
+    // Explore page logic (no build step, pure static)
+    (function () {
+      const DEFAULT = { lat: 36.15398, lng: -95.99277, zoom: 12 }; // Tulsa-ish fallback
+      const state = {
+        map: null,
+        center: { ...DEFAULT },
+        gpsOn: false,
+        radiusMi: 2.0,
+        markers: new Map(),
+        selectedHouseId: null,
+      };
 
-    let map = null;
-    let markers = [];
-    let gpsWatchId = null;
-    let userPos = null;
-    let selectedHouseId = null;
+      const $ = (id) => document.getElementById(id);
 
-    function milesToMeters(mi){ return mi * 1609.344; }
+      const el = {
+        btnGPS: $("btnGPS"),
+        btnRecenter: $("btnRecenter"),
+        btnDemo: $("btnDemo"),
+        gpsDot: $("gpsDot"),
+        gpsTxt: $("gpsTxt"),
+        radius: $("radius"),
+        radiusVal: $("radiusVal"),
+        homesList: $("homesList"),
+        homesEmpty: $("homesEmpty"),
+        linksEmpty: $("linksEmpty"),
+        linksList: $("linksList"),
+        tabHomes: $("tabHomes"),
+        tabLinks: $("tabLinks"),
+        panelHomes: $("panelHomes"),
+        panelLinks: $("panelLinks"),
+      };
 
-    function distMeters(aLat,aLng,bLat,bLng){
-      // haversine
-      const R = 6371000;
-      const toRad = (d)=>d*Math.PI/180;
-      const dLat = toRad(bLat-aLat);
-      const dLng = toRad(bLng-aLng);
-      const sa = Math.sin(dLat/2)**2 + Math.cos(toRad(aLat))*Math.cos(toRad(bLat))*Math.sin(dLng/2)**2;
-      return 2*R*Math.asin(Math.sqrt(sa));
-    }
-
-    function makeIcon(letter){
-      return L.divIcon({
-        className: "",
-        html: `<div class="house-pin"><span>${letter}</span></div>`,
-        iconSize: [38,38],
-        iconAnchor: [19,38],
-        popupAnchor: [0,-34]
-      });
-    }
-
-    function clearMarkers(){
-      markers.forEach(m => m.remove());
-      markers = [];
-    }
-
-    function safeInvalidate(){
-      try{ map && map.invalidateSize(); } catch(e){}
-    }
-
-    function setTabs(which){
-      const homes = $("panelHomes");
-      const links = $("panelLinks");
-      const th = $("tabHomes");
-      const tl = $("tabLinks");
-      if(which === "links"){
-        homes.style.display="none";
-        links.style.display="block";
-        th.classList.remove("active");
-        tl.classList.add("active");
-      } else {
-        homes.style.display="block";
-        links.style.display="none";
-        tl.classList.remove("active");
-        th.classList.add("active");
-      }
-    }
-
-    $("tabHomes").addEventListener("click", ()=>setTabs("homes"));
-    $("tabLinks").addEventListener("click", ()=>setTabs("links"));
-
-    function renderLinksPanel(house){
-      const linksEl = $("links");
-      linksEl.innerHTML = "";
-
-      if(!house){
-        $("linksTitle").textContent = "No home selected";
-        $("linksEmpty").style.display="block";
-        return;
+      function setTab(which) {
+        const homesOn = which === "homes";
+        el.tabHomes.dataset.on = homesOn ? "1" : "0";
+        el.tabLinks.dataset.on = homesOn ? "0" : "1";
+        el.panelHomes.classList.toggle("hide", !homesOn);
+        el.panelLinks.classList.toggle("hide", homesOn);
       }
 
-      $("linksTitle").textContent = house.name + " — links";
-      const items = Array.isArray(house.items) ? house.items : [];
-      const withLinks = items.filter(it => (it.link || "").trim().length > 0);
-
-      if(withLinks.length === 0){
-        $("linksEmpty").style.display="block";
-        $("linksEmpty").textContent = "No linked items yet for this home.";
-        return;
+      function setGPSUI(on) {
+        el.gpsTxt.textContent = on ? "on" : "off";
+        el.gpsDot.classList.toggle("on", !!on);
       }
 
-      $("linksEmpty").style.display="none";
-      withLinks.forEach(it=>{
-        const div = document.createElement("div");
-        div.className = "linkItem";
-        div.innerHTML = `
-          <div style="font-weight:800">${escapeHtml(it.title || "Item")}</div>
-          <div class="mini" style="margin-top:6px">
-            ${(it.brand||it.finish||it.category) ? `${escapeHtml([it.category,it.brand,it.finish].filter(Boolean).join(" • "))}<br/>` : ""}
-            <a href="${escapeAttr(it.link)}" target="_blank" rel="noopener">${escapeHtml(it.link)}</a>
-          </div>
-        `;
-        linksEl.appendChild(div);
-      });
-    }
+      function haversineMi(a, b) {
+        const R = 3958.8; // miles
+        const toRad = (d) => d * Math.PI / 180;
+        const dLat = toRad(b.lat - a.lat);
+        const dLon = toRad(b.lng - a.lng);
+        const lat1 = toRad(a.lat);
+        const lat2 = toRad(b.lat);
+        const x = Math.sin(dLat / 2) ** 2 +
+                  Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+        return R * c;
+      }
 
-    function renderHouses(){
-      const center = userPos || DEFAULT;
-      const radiusMi = Number($("radius").value || 2);
-      $("radiusLabel").textContent = radiusMi + " mi";
+      function getVisibleHouses() {
+        const all = (window.HomagioDB?.listHouses?.() || []);
+        return all
+          .filter(h => typeof h.lat === "number" && typeof h.lng === "number")
+          .map(h => ({
+            ...h,
+            distMi: haversineMi(state.center, { lat: h.lat, lng: h.lng })
+          }))
+          .filter(h => h.distMi <= state.radiusMi)
+          .sort((a,b) => a.distMi - b.distMi);
+      }
 
-      const houses = HomagioDB.listHouses()
-        .filter(h => typeof h.lat === "number" && typeof h.lng === "number")
-        .map(h => {
-          const d = distMeters(center.lat, center.lng, h.lat, h.lng);
-          return { ...h, _dist: d };
-        })
-        .filter(h => h._dist <= milesToMeters(radiusMi))
-        .sort((a,b)=>a._dist - b._dist);
-
-      $("homesTitle").textContent = userPos ? "Nearby (GPS)" : "Nearby (default)";
-      $("homesEmpty").style.display = houses.length ? "none" : "block";
-
-      // Markers
-      clearMarkers();
-      houses.forEach((h, idx)=>{
-        const letter = (h.name || "H").trim().slice(0,1).toUpperCase();
-        const m = L.marker([h.lat, h.lng], { icon: makeIcon(letter) }).addTo(map);
-        m.on("click", ()=>{
-          selectedHouseId = h.id;
-          setTabs("links");
-          renderLinksPanel(HomagioDB.getHouse(h.id));
+      function markerIcon(houseId, label, selected) {
+        return L.divIcon({
+          className: "",
+          html: `<div class="price-pin ${selected ? "sel" : ""}">
+                  <span class="mini"></span>
+                  <span>${label}</span>
+                </div>`,
+          iconSize: [1, 1],
+          iconAnchor: [0, 0]
         });
-        m.bindPopup(`<b>${escapeHtml(h.name)}</b><br/>${escapeHtml(h.address || "")}<br/><a href="./house.html?id=${encodeURIComponent(h.id)}">Open</a>`);
-        markers.push(m);
-      });
-
-      // Cards
-      const el = $("homes");
-      el.innerHTML = "";
-      houses.forEach((h)=>{
-        const mi = h._dist / 1609.344;
-        const remaining = (Number(h.budgetTotal)||0) - (Number(h.budgetSpent)||0);
-        const card = document.createElement("div");
-        card.className = "homeCard";
-        card.innerHTML = `
-          <div class="name">${escapeHtml(h.name)}</div>
-          <div class="pill">• ${(h.tier||"Free")} • ${(h.style||"Style")}</div>
-          <div class="mini" style="margin-top:8px">
-            ${escapeHtml(h.address || "(no address)") }<br/>
-            ${mi.toFixed(1)} mi away • Remaining $${Number(remaining||0).toLocaleString(undefined,{maximumFractionDigits:0})}
-          </div>
-          <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
-            <a class="btn" style="padding:8px 10px" href="./house.html?id=${encodeURIComponent(h.id)}">Open</a>
-            <button class="btn" style="padding:8px 10px" data-links="${h.id}">Links</button>
-            <button class="btn" style="padding:8px 10px" data-fly="${h.id}">Fly to</button>
-          </div>
-        `;
-        card.addEventListener("click", (e)=>{
-          const fly = e.target && e.target.getAttribute && e.target.getAttribute("data-fly");
-          const links = e.target && e.target.getAttribute && e.target.getAttribute("data-links");
-          if(fly){
-            e.stopPropagation();
-            const hh = HomagioDB.getHouse(fly);
-            if(hh) map.setView([hh.lat, hh.lng], 15, { animate:true });
-            return;
-          }
-          if(links){
-            e.stopPropagation();
-            selectedHouseId = links;
-            setTabs("links");
-            renderLinksPanel(HomagioDB.getHouse(links));
-            return;
-          }
-          map.setView([h.lat, h.lng], 15, { animate:true });
-        });
-        el.appendChild(card);
-      });
-
-      // Keep links panel in sync if a home is selected
-      if(selectedHouseId){
-        renderLinksPanel(HomagioDB.getHouse(selectedHouseId));
       }
-    }
 
-    function setGPS(on){
-      if(on){
-        if(!navigator.geolocation){
-          $("gpsStatus").textContent = "GPS: unavailable";
+      function selectHouse(houseId, { pan = true, openPopup = true } = {}) {
+        state.selectedHouseId = houseId;
+        setTab("links");
+        render(); // rerender markers to highlight selection
+
+        const house = window.HomagioDB?.getHouse?.(houseId);
+        if (!house) return;
+
+        if (pan && state.map) state.map.panTo([house.lat, house.lng], { animate: true });
+        if (openPopup) {
+          const mk = state.markers.get(houseId);
+          if (mk) mk.openPopup();
+        }
+      }
+
+      function renderHomesPanel(houses) {
+        el.homesList.innerHTML = "";
+
+        if (!houses.length) {
+          el.homesEmpty.classList.remove("hide");
           return;
         }
-        $("gpsStatus").textContent = "GPS: searching…";
-        $("btnGPS").textContent = "GPS on";
-        gpsWatchId = navigator.geolocation.watchPosition(
-          (pos)=>{
-            userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            $("gpsStatus").textContent = "GPS: on";
-            map.setView([userPos.lat, userPos.lng], 13, { animate:true });
-            renderHouses();
-          },
-          (err)=>{
-            console.warn(err);
-            $("gpsStatus").textContent = "GPS: blocked";
-            $("btnGPS").textContent = "GPS off";
-            userPos = null;
-            if(gpsWatchId){ navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId=null; }
-            renderHouses();
-          },
-          { enableHighAccuracy:true, maximumAge: 8000, timeout: 10000 }
-        );
-      } else {
-        $("btnGPS").textContent = "GPS off";
-        $("gpsStatus").textContent = "GPS: off";
-        userPos = null;
-        if(gpsWatchId){ navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId=null; }
-        map.setView([DEFAULT.lat, DEFAULT.lng], DEFAULT.zoom);
-        renderHouses();
+        el.homesEmpty.classList.add("hide");
+
+        for (const h of houses) {
+          const div = document.createElement("div");
+          div.className = "item-card";
+          div.innerHTML = `
+            <div class="item-top">
+              <div>
+                <div class="item-title">${window.HomagioCore ? HomagioCore.escapeHTML(h.name) : (h.name || "House")}</div>
+                <div class="item-sub">
+                  ${(h.address ? (window.HomagioCore ? HomagioCore.escapeHTML(h.address) : h.address) : "No address")}
+                  • ${h.distMi.toFixed(1)} mi
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <a class="btn sm" href="/house.html?id=${encodeURIComponent(h.id)}">Open</a>
+                <button class="btn sm primary" data-sel="${h.id}">Select</button>
+              </div>
+            </div>
+
+            <div class="sp10"></div>
+            <div class="row" style="gap:10px;">
+              <div class="badge">Style: <b style="margin-left:6px;">${window.HomagioCore ? HomagioCore.escapeHTML(h.style || "—") : (h.style || "—")}</b></div>
+              <div class="badge blue">Tier: <b style="margin-left:6px;">${window.HomagioCore ? HomagioCore.escapeHTML(h.tier || "Free") : (h.tier || "Free")}</b></div>
+            </div>
+          `;
+          div.querySelector('button[data-sel]')?.addEventListener("click", () => selectHouse(h.id));
+          div.addEventListener("dblclick", () => selectHouse(h.id));
+          el.homesList.appendChild(div);
+        }
       }
-    }
 
-    $("btnGPS").addEventListener("click", ()=>{
-      if(gpsWatchId) setGPS(false);
-      else setGPS(true);
-    });
+      function renderLinksPanel() {
+        const id = state.selectedHouseId;
+        const house = id ? window.HomagioDB?.getHouse?.(id) : null;
 
-    $("btnRecenter").addEventListener("click", ()=>{
-      const c = userPos || DEFAULT;
-      map.setView([c.lat, c.lng], userPos ? 13 : DEFAULT.zoom, { animate:true });
-    });
+        if (!house) {
+          el.linksList.classList.add("hide");
+          el.linksEmpty.classList.remove("hide");
+          return;
+        }
 
-    $("btnDemo").addEventListener("click", ()=>{
-      // seed near current view center so "nearby" always shows
-      const c = map.getCenter();
-      HomagioDB.seedDemoNear(c.lat, c.lng, true);
-      renderHouses();
-      setTabs("homes");
-    });
+        const items = Array.isArray(house.items) ? house.items : [];
+        const photos = Array.isArray(house.photos) ? house.photos : [];
 
-    $("radius").addEventListener("input", renderHouses);
+        const photoById = new Map(photos.map(p => [p.id, p]));
+        const linked = items.filter(it => (it.link && String(it.link).trim().length > 0));
 
-    function escapeHtml(str){
-      return String(str || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-    function escapeAttr(str){
-      return String(str || "").replaceAll('"',"&quot;");
-    }
+        el.linksList.innerHTML = "";
 
-    // Init map
-    HomagioDB.ensure();
+        if (!linked.length) {
+          el.linksList.classList.add("hide");
+          el.linksEmpty.classList.remove("hide");
+          el.linksEmpty.innerHTML = `
+            <b>No linked items yet.</b><br/>
+            Open this home and add items with purchase links.
+            <div class="sp10"></div>
+            <a class="btn sm primary" href="/house.html?id=${encodeURIComponent(house.id)}">Open ${window.HomagioCore ? HomagioCore.escapeHTML(house.name) : (house.name || "House")}</a>
+          `;
+          return;
+        }
 
-    map = L.map("map", { zoomControl: true });
-    // Lighter tiles (your earlier preference)
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 20,
-      attribution: '&copy; OpenStreetMap &copy; CARTO'
-    }).addTo(map);
+        el.linksEmpty.classList.add("hide");
+        el.linksList.classList.remove("hide");
 
-    map.setView([DEFAULT.lat, DEFAULT.lng], DEFAULT.zoom);
-    window.addEventListener("resize", safeInvalidate);
+        for (const it of linked) {
+          const p = it.photoId ? photoById.get(it.photoId) : null;
 
-    // Initial render
-    renderHouses();
-    safeInvalidate();
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `
+            <div class="item-top">
+              <div>
+                <div class="item-title">${window.HomagioCore ? HomagioCore.escapeHTML(it.title || "Item") : (it.title || "Item")}</div>
+                <div class="item-sub">
+                  ${(it.category ? (window.HomagioCore ? HomagioCore.escapeHTML(it.category) : it.category) : "Uncategorized")}
+                  ${it.brand ? " • " + (window.HomagioCore ? HomagioCore.escapeHTML(it.brand) : it.brand) : ""}
+                  ${it.finish ? " • " + (window.HomagioCore ? HomagioCore.escapeHTML(it.finish) : it.finish) : ""}
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                <span class="badge">${(window.HomagioCore ? HomagioCore.formatMoney(it.price || 0) : ("$" + (it.price || 0)))}</span>
+                <a class="btn sm primary" href="${window.HomagioCore ? HomagioCore.escapeHTML(it.link) : it.link}" target="_blank" rel="noopener noreferrer">Open link</a>
+              </div>
+            </div>
+
+            ${p && p.url ? `
+              <div class="sp10"></div>
+              <div class="row" style="gap:10px;">
+                <div style="flex:0 0 110px;">
+                  <img src="${window.HomagioCore ? HomagioCore.escapeHTML(p.url) : p.url}" alt="" style="width:110px;height:76px;object-fit:cover;border-radius:12px;border:1px solid rgba(15,23,42,.12);" />
+                </div>
+                <div class="small muted2">
+                  Linked photo: ${(p.caption ? (window.HomagioCore ? HomagioCore.escapeHTML(p.caption) : p.caption) : "—")}
+                </div>
+              </div>
+            ` : ``}
+          `;
+          el.linksList.appendChild(card);
+        }
+      }
+
+      function renderMarkers(houses) {
+        if (!state.map) return;
+
+        // Remove old markers
+        for (const [id, mk] of state.markers.entries()) {
+          state.map.removeLayer(mk);
+        }
+        state.markers.clear();
+
+        for (const h of houses) {
+          const selected = h.id === state.selectedHouseId;
+          const label = (h.distMi <= 0.05) ? "Here" : `${h.distMi.toFixed(1)} mi`;
+
+          const mk = L.marker([h.lat, h.lng], {
+            icon: markerIcon(h.id, label, selected),
+            keyboard: false
+          });
+
+          mk.on("click", () => selectHouse(h.id, { pan: false, openPopup: true }));
+
+          mk.bindPopup(`
+            <div style="min-width:220px;">
+              <div style="font-weight:900; margin-bottom:4px;">${window.HomagioCore ? HomagioCore.escapeHTML(h.name) : (h.name || "House")}</div>
+              <div style="color:#475569; font-size:12px; margin-bottom:10px;">
+                ${(h.address ? (window.HomagioCore ? HomagioCore.escapeHTML(h.address) : h.address) : "No address")}
+                • ${h.distMi.toFixed(1)} mi
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <a class="btn sm" href="/house.html?id=${encodeURIComponent(h.id)}">Open</a>
+                <button class="btn sm primary" onclick="(function(){ try{ window.__homagioSelect && window.__homagioSelect('${h.id}'); }catch(e){} })()">Select</button>
+              </div>
+            </div>
+          `, { closeButton: true });
+
+          mk.addTo(state.map);
+          state.markers.set(h.id, mk);
+        }
+      }
+
+      function render() {
+        const houses = getVisibleHouses();
+        renderHomesPanel(houses);
+        renderMarkers(houses);
+        renderLinksPanel();
+      }
+
+      async function initMap() {
+        // Wait for Leaflet
+        if (!window.L) {
+          setTimeout(initMap, 50);
+          return;
+        }
+
+        state.map = L.map("map", { zoomControl: true, preferCanvas: true });
+
+        // Zillow-ish light tiles (CartoDB Positron)
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+          maxZoom: 19,
+          attribution: "&copy; OpenStreetMap &copy; CARTO"
+        }).addTo(state.map);
+
+        state.map.setView([state.center.lat, state.center.lng], DEFAULT.zoom);
+
+        // global hook for popup button
+        window.__homagioSelect = (id) => selectHouse(id);
+
+        render();
+      }
+
+      function recenter() {
+        if (!state.map) return;
+        state.map.setView([state.center.lat, state.center.lng], DEFAULT.zoom, { animate: true });
+        render();
+      }
+
+      function enableGPS(on) {
+        state.gpsOn = !!on;
+        setGPSUI(state.gpsOn);
+
+        if (!state.gpsOn) {
+          window.HomagioCore?.toast?.("GPS off", "Using map center instead of your device location.", "info", 2200);
+          return;
+        }
+
+        if (!navigator.geolocation) {
+          state.gpsOn = false;
+          setGPSUI(false);
+          window.HomagioCore?.toast?.("GPS unavailable", "Your browser/device does not support geolocation.", "bad", 3000);
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            state.center = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            window.HomagioCore?.toast?.("GPS on", "Centered on your current location.", "good", 2200);
+            recenter();
+          },
+          (err) => {
+            state.gpsOn = false;
+            setGPSUI(false);
+            window.HomagioCore?.toast?.("GPS blocked", "Allow location access to use GPS mode.", "bad", 3200);
+            console.warn("GPS error", err);
+          },
+          { enableHighAccuracy: true, timeout: 9000, maximumAge: 5000 }
+        );
+      }
+
+      function seedDemo() {
+        try {
+          const fn = window.HomagioDB?.seedDemoNear;
+          if (typeof fn !== "function") {
+            window.HomagioCore?.toast?.("Demo unavailable", "HomagioDB.seedDemoNear not found.", "bad", 3200);
+            return;
+          }
+          fn(state.center.lat, state.center.lng, true);
+          window.HomagioCore?.toast?.("Demo homes loaded", "Sample homes added near your center.", "good", 2400);
+          setTab("homes");
+          render();
+        } catch (e) {
+          console.warn(e);
+          window.HomagioCore?.toast?.("Demo failed", "Check console for details.", "bad", 3200);
+        }
+      }
+
+      // Wire up UI
+      document.addEventListener("DOMContentLoaded", () => {
+        // radius
+        const r = parseFloat(el.radius.value || "2");
+        state.radiusMi = Number.isFinite(r) ? r : 2.0;
+        el.radiusVal.textContent = state.radiusMi.toFixed(1);
+
+        el.radius.addEventListener("input", () => {
+          state.radiusMi = parseFloat(el.radius.value || "2") || 2.0;
+          el.radiusVal.textContent = state.radiusMi.toFixed(1);
+          render();
+        });
+
+        // tabs
+        el.tabHomes.addEventListener("click", () => setTab("homes"));
+        el.tabLinks.addEventListener("click", () => setTab("links"));
+
+        // buttons
+        el.btnGPS.addEventListener("click", () => enableGPS(!state.gpsOn));
+        el.btnRecenter.addEventListener("click", () => recenter());
+        el.btnDemo.addEventListener("click", () => seedDemo());
+
+        // initial GPS UI
+        setGPSUI(false);
+        setTab("homes");
+
+        // init map
+        initMap();
+      });
+    })();
   </script>
 </body>
 </html>
