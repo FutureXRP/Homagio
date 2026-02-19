@@ -3,845 +3,378 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Homagio — Manage your home, materials, and budget</title>
-  <meta name="description" content="Homagio helps homeowners and pros track materials, photos, budgets, and export reports — all in one place." />
-
+  <title>Homagio — My Houses</title>
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#07090d" />
 
-  <meta property="og:title" content="Homagio" />
-  <meta property="og:description" content="Manage your home, materials, and budget." />
-  <meta property="og:type" content="website" />
-
-  <!-- ✅ Homagio local DB -->
-  <script src="assets/db.js"></script>
+  <!-- ✅ FIX: correct DB file -->
+  <script src="assets.db.js"></script>
 
   <style>
-    /* (UNCHANGED STYLES — your original) */
     :root{
       color-scheme: dark;
-
-      --bg0:#07090d;
-      --bg1:#0b0f16;
-      --bg2:#0e1320;
-
-      --text:#e9eef7;
-      --muted:#b7c0d6;
-      --muted2:#8a94ab;
-
-      --card: rgba(255,255,255,.06);
-      --card2: rgba(255,255,255,.08);
-      --border: rgba(255,255,255,.12);
-
+      --bg0:#07090d; --bg1:#0b0f16; --bg2:#0e1320;
+      --text:#e9eef7; --muted:#b7c0d6; --muted2:#8a94ab;
       --shadow: 0 12px 40px rgba(0,0,0,.55);
-      --shadow2: 0 18px 80px rgba(0,0,0,.55);
-
-      --blue:#2d6cdf;
-      --blue2:#1f4fb0;
-      --green:#1fbf6a;
-      --gold:#d8b04c;
-
-      --radius-xl: 22px;
-      --radius-lg: 18px;
-      --radius-md: 14px;
-
-      --max: 1120px;
+      --blue:#2d6cdf; --blue2:#1f4fb0; --green:#1fbf6a;
+      --max: 980px;
     }
-
     *{box-sizing:border-box}
-    html,body{height:100%}
+    html,body{height:100%;margin:0}
     body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background:
-        radial-gradient(1200px 700px at 20% 10%, rgba(45,108,223,.22), transparent 60%),
-        radial-gradient(900px 600px at 85% 30%, rgba(31,191,106,.14), transparent 55%),
-        radial-gradient(900px 700px at 40% 110%, rgba(216,176,76,.10), transparent 55%),
+        radial-gradient(1200px 700px at 20% 10%, rgba(45,108,223,.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 30%, rgba(31,191,106,.12), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1) 35%, var(--bg2));
-      overflow-x:hidden;
+      color:var(--text);
     }
-
-    body{ scrollbar-color: rgba(233,238,247,.22) rgba(255,255,255,.06); }
-    ::-webkit-scrollbar{height:10px;width:10px}
-    ::-webkit-scrollbar-thumb{background:rgba(233,238,247,.18);border-radius:999px}
-    ::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:999px}
-
     a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
-
-    .wrap{
-      width: min(var(--max), calc(100% - 40px));
-      margin: 0 auto;
+    .wrap{max-width:var(--max);margin:0 auto;padding:14px}
+    .top{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 0;
     }
-
-    .nav{
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      background: rgba(8,10,15,.62);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-
-    .nav-inner{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 14px 0;
-      gap:14px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width: 160px;
-    }
-
+    .brand{display:flex;gap:10px;align-items:center;font-weight:900}
     .logo{
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.22), transparent 45%),
-                  linear-gradient(145deg, rgba(45,108,223,.7), rgba(31,191,106,.35));
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 10px 22px rgba(0,0,0,.35);
-      overflow:hidden;
-      display:grid;
-      place-items:center;
+      width:36px;height:36px;border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.25), transparent 40%),
+        linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
+      box-shadow: 0 0 0 6px rgba(45,108,223,.22), 0 14px 34px rgba(0,0,0,.45);
+      display:grid;place-items:center;
     }
-    .logo img{width:100%;height:100%;object-fit:cover}
-
-    .brand-name{line-height:1.1;}
-    .brand-name b{display:block;font-size: 14px;letter-spacing:.2px;}
-    .brand-name span{display:block;font-size: 12px;color: var(--muted2);margin-top:3px;}
-
-    .nav-links{
-      display:none;
-      gap:18px;
-      align-items:center;
-      color: var(--muted);
-      font-size: 14px;
+    .logo:before{content:"H";font-weight:1000}
+    .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
     }
-    .nav-links a{
-      padding:8px 10px;
-      border-radius: 12px;
-      transition: .18s ease;
-    }
-    .nav-links a:hover{
-      background: rgba(255,255,255,.06);
-      color: var(--text);
+    .pill:hover{background: rgba(255,255,255,.06); color:var(--text)}
+    .pill.primary{
+      border-color: rgba(45,108,223,.45);
+      background: linear-gradient(180deg, rgba(45,108,223,.85), rgba(31,79,176,.85));
+      color:#fff;
     }
 
-    .nav-cta{
-      display:flex;
-      align-items:center;
-      gap:10px;
+    .panel{
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow);
     }
+
+    .row{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:10px;padding:12px 10px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      margin-bottom:10px;
+    }
+    .row b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+    .row small{display:block;color:var(--muted2);margin-top:3px}
+    .right{display:flex;gap:8px;align-items:center}
 
     .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: 14px;
-      border: 1px solid transparent;
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 12px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-weight:900;font-size:13px;
       cursor:pointer;
-      transition: transform .12s ease, opacity .12s ease, background .12s ease, border-color .12s ease;
       user-select:none;
-      white-space:nowrap;
     }
-    .btn:active{transform: scale(.98)}
-    .btn-primary{
-      background: linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
-      border-color: rgba(255,255,255,.12);
-      box-shadow: 0 14px 26px rgba(45,108,223,.15);
+    .btn:hover{background: rgba(255,255,255,.07)}
+    .btn.primary{
+      border-color: rgba(45,108,223,.45);
+      background: linear-gradient(180deg, rgba(45,108,223,.92), rgba(31,79,176,.92));
+      color:#fff;
     }
-    .btn-primary:hover{opacity:.95}
-    .btn-ghost{
-      background: rgba(255,255,255,.06);
-      border-color: rgba(255,255,255,.10);
-      color: var(--text);
+    .btn.danger{
+      border-color: rgba(255,90,90,.35);
+      background: rgba(255,90,90,.10);
+      color:#ffd9d9;
     }
-    .btn-ghost:hover{background: rgba(255,255,255,.08)}
-    .btn-link{
-      background: transparent;
-      border-color: transparent;
-      color: var(--muted);
-      padding: 10px 10px;
-    }
-    .btn-link:hover{color: var(--text); background: rgba(255,255,255,.05)}
+    .btn:disabled{opacity:.65;cursor:not-allowed}
 
-    .menu{
-      display:inline-flex;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      border-radius: 14px;
-      padding: 11px 12px;
-    }
-    .menu svg{opacity:.9}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width: 720px){ .grid2{grid-template-columns:1fr} }
 
-    .drawer{
-      display:none;
-      border-top: 1px solid rgba(255,255,255,.08);
-      background: rgba(8,10,15,.62);
-    }
-    .drawer a{
-      display:block;
-      padding: 14px 0;
-      color: var(--muted);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .drawer a:last-child{border-bottom:none}
-    .drawer a:hover{color: var(--text)}
-    .drawer .wrap{padding-bottom: 10px}
-
-    .hero{ padding: 42px 0 20px; }
-    .hero-grid{ display:grid; gap: 18px; align-items: center; }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(216,176,76,.35);
-      background: linear-gradient(180deg, rgba(216,176,76,.20), rgba(216,176,76,.10));
-      color: #f1db9a;
-      font-weight: 800;
-      font-size: 12px;
-      letter-spacing: .6px;
-      text-transform: uppercase;
-      width: fit-content;
-    }
-    .chip-dot{
-      width:8px;height:8px;border-radius:99px;
-      background: var(--gold);
-      box-shadow: 0 0 0 6px rgba(216,176,76,.10);
-    }
-
-    h1{
-      margin: 14px 0 10px;
-      font-size: 40px;
-      line-height: 1.05;
-      letter-spacing: -.8px;
-    }
-    .subhead{
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.5;
-      max-width: 58ch;
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .trust{
-      display:flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-      color: var(--muted2);
-      font-size: 13px;
-    }
-    .trust b{color: var(--text)}
-    .trust .pill{
-      padding: 8px 10px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      border-radius: 999px;
-    }
-
-    .device{
-      border-radius: var(--radius-xl);
-      border: 1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow: var(--shadow2);
-      overflow:hidden;
-      position: relative;
-    }
-    .device::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: radial-gradient(600px 260px at 20% 0%, rgba(45,108,223,.22), transparent 55%),
-                  radial-gradient(520px 260px at 90% 10%, rgba(31,191,106,.12), transparent 55%);
-      pointer-events:none;
-    }
-    .device-inner{ padding: 14px; position: relative; }
-    .device-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom: 10px;
-      color: var(--muted2);
-      font-size: 12px;
-    }
-    .device-top .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border:1px solid rgba(216,176,76,.30);
-      background: rgba(216,176,76,.12);
-      color:#f3e2a8;
-      font-weight: 800;
-      letter-spacing:.5px;
-    }
-
-    .shot{
-      border-radius: 18px;
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.25);
-      aspect-ratio: 9/16;
-    }
-    .shot img{ width:100%; height:100%; object-fit: cover; }
-    .shot .placeholder{
+    .field label{display:block;font-size:12px;color:var(--muted);font-weight:900;margin-bottom:6px}
+    .field input{
       width:100%;
-      height:100%;
-      display:grid;
-      place-items:center;
-      color: rgba(255,255,255,.55);
-      font-size: 13px;
-      padding: 16px;
-      text-align:center;
-      background: radial-gradient(circle at 30% 20%, rgba(45,108,223,.18), transparent 55%),
-                  radial-gradient(circle at 80% 10%, rgba(31,191,106,.12), transparent 55%),
-                  linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-    }
-
-    section{ padding: 26px 0; }
-    .section-title{ font-size: 22px; letter-spacing: -.2px; margin: 0 0 10px; }
-    .section-sub{ margin: 0 0 18px; color: var(--muted); line-height: 1.6; }
-
-    .grid-3{ display:grid; gap: 12px; }
-    .card{
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.06);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      position: relative;
-      overflow:hidden;
-    }
-    .card::after{
-      content:"";
-      position:absolute;
-      inset:-1px;
-      background: radial-gradient(420px 120px at 30% 0%, rgba(45,108,223,.16), transparent 60%);
-      pointer-events:none;
-    }
-
-    .icon{
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      display:grid;
-      place-items:center;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      margin-bottom: 12px;
-    }
-    .icon.blue{background: rgba(45,108,223,.12); border-color: rgba(45,108,223,.25)}
-    .icon.green{background: rgba(31,191,106,.10); border-color: rgba(31,191,106,.22)}
-    .icon.gold{background: rgba(216,176,76,.10); border-color: rgba(216,176,76,.24)}
-
-    .card h3{ margin: 0 0 6px; font-size: 16px; letter-spacing: -.2px; }
-    .card p{
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 14px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .shots{ display:grid; gap: 12px; }
-    .shot-tile{
-      border-radius: var(--radius-xl);
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      overflow:hidden;
-      box-shadow: var(--shadow);
-    }
-    .shot-tile img{ width:100%; height:100%; object-fit: cover; aspect-ratio: 16/10; }
-    .shot-caption{ padding: 14px 14px 16px; }
-    .shot-caption b{display:block; margin-bottom:4px}
-    .shot-caption span{color: var(--muted); font-size: 13px; line-height: 1.5}
-
-    .pricing{ display:grid; gap: 12px; }
-    .price{ padding: 18px; }
-    .price .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size: 12px;
-      color: var(--muted2);
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      padding: 7px 10px;
-      border-radius: 999px;
-      margin-bottom: 10px;
-    }
-    .price .amount{
-      font-size: 34px;
-      font-weight: 900;
-      letter-spacing:-.8px;
-      margin: 0 0 8px;
-    }
-    .price .amount small{
-      font-size: 14px;
-      color: var(--muted2);
-      font-weight: 700;
-      margin-left: 6px;
-    }
-    .list{ margin: 12px 0 0; padding: 0; list-style:none; color: var(--muted); font-size: 14px; line-height: 1.7; }
-    .list li{ padding-left: 24px; position: relative; margin: 7px 0; }
-    .list li::before{
-      content:"";
-      position:absolute;
-      left:0;
-      top:.55em;
-      width: 10px;
-      height: 10px;
-      border-radius: 99px;
-      background: rgba(31,191,106,.9);
-      box-shadow: 0 0 0 6px rgba(31,191,106,.12);
-    }
-    .list li.dim::before{
-      background: rgba(255,255,255,.22);
-      box-shadow: 0 0 0 6px rgba(255,255,255,.08);
-    }
-
-    .cta-band{
-      border-radius: 26px;
+      padding:12px 12px;
+      border-radius:14px;
       border:1px solid rgba(255,255,255,.12);
-      background: radial-gradient(700px 240px at 20% 10%, rgba(45,108,223,.22), transparent 60%),
-                  radial-gradient(700px 240px at 85% 20%, rgba(31,191,106,.16), transparent 60%),
-                  rgba(255,255,255,.06);
-      box-shadow: var(--shadow2);
-      padding: 22px;
-      display:grid;
-      gap: 12px;
-      align-items:center;
+      background: rgba(0,0,0,.22);
+      color:var(--text);
+      outline:none;
     }
-    .cta-band h2{ margin:0; font-size: 22px; letter-spacing:-.4px; }
-    .cta-band p{ margin:0; color: var(--muted); line-height:1.6; font-size: 14px; }
+    .field input:focus{border-color: rgba(45,108,223,.55)}
+    .hint{font-size:12px;color:var(--muted2);margin-top:6px;line-height:1.35}
+    details.advanced{margin-top:12px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.03)}
+    details.advanced summary{cursor:pointer;color:var(--muted);font-weight:700}
 
-    footer{ padding: 40px 0 60px; color: var(--muted2); }
-    .foot{ display:grid; gap: 16px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 18px; }
-    .foot a{color: var(--muted); }
-    .foot a:hover{color: var(--text)}
-    .fine{ font-size: 12px; color: var(--muted2); line-height: 1.6; }
-
-    @media (min-width: 860px){
-      .nav-links{display:flex}
-      .menu{display:none}
-      .hero{padding: 64px 0 30px}
-      .hero-grid{grid-template-columns: 1.15fr .85fr; gap: 28px}
-      h1{font-size: 54px}
-      .subhead{font-size: 17px}
-      .grid-3{grid-template-columns: repeat(3, 1fr); gap: 14px}
-      .shots{grid-template-columns: repeat(2, 1fr); gap: 14px}
-      .pricing{grid-template-columns: repeat(2, 1fr); gap: 14px}
-      .cta-band{grid-template-columns: 1.3fr .7fr; padding: 26px}
-      .cta-band .actions{justify-content:flex-end}
-      .foot{grid-template-columns: 1.2fr .8fr .8fr; align-items:start}
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      *{scroll-behavior:auto; transition:none !important; animation:none !important}
-    }
+    .sp{height:12px}
+    h2{margin:0 0 10px}
   </style>
 </head>
-
 <body>
-
-  <!-- NAV -->
-  <header class="nav">
-    <div class="wrap nav-inner">
+  <div class="wrap">
+    <div class="top">
       <a class="brand" href="index.html">
-        <div class="logo" aria-label="Homagio logo">
-          <img src="assets/logo.png" alt="Homagio logo"
-               onerror="this.remove(); this.parentElement.style.background='linear-gradient(145deg, rgba(45,108,223,.7), rgba(31,191,106,.35))';" />
-        </div>
-        <div class="brand-name">
-          <b>Homagio</b>
-          <span>Homes • Materials • Budget</span>
-        </div>
+        <div class="logo" aria-hidden="true"></div>
+        <div>Homagio</div>
       </a>
-
-      <nav class="nav-links" aria-label="Primary">
-        <a href="#features">Features</a>
-        <a href="#screens">Screens</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#pros">For Pros</a>
-        <a href="#support">Support</a>
-      </nav>
-
-      <div class="nav-cta">
-        <!-- ✅ “Sign in” routes into owner dashboard for now -->
-        <a class="btn btn-link" href="my.html">My Houses</a>
-        <!-- ✅ “Get Started” routes into Explore -->
-        <a class="btn btn-primary" href="explore.html">Explore</a>
-
-        <button class="menu" id="menuBtn" aria-label="Open menu" aria-expanded="false">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M4 7h16M4 12h16M4 17h16" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
+      <div class="nav">
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill primary" href="my.html">My Houses</a>
+        <a class="pill" href="explore.html">Explore</a>
       </div>
     </div>
 
-    <div class="drawer" id="drawer">
-      <div class="wrap">
-        <a href="explore.html">Explore</a>
-        <a href="my.html">My Houses</a>
-        <a href="#features">Features</a>
-        <a href="#screens">Screens</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#pros">For Pros</a>
-        <a href="#support">Support</a>
+    <div class="panel">
+      <h2>My Houses</h2>
+      <div id="homesList"></div>
+
+      <div class="sp"></div>
+      <div class="right" style="justify-content:flex-start;flex-wrap:wrap">
+        <button class="btn" onclick="openFirstOrCreate()">Open first house</button>
+        <button class="btn danger" onclick="resetDemo()">Reset demo data</button>
+      </div>
+
+      <div class="sp"></div>
+      <div style="border-top:1px solid rgba(255,255,255,.10);margin:14px 0"></div>
+
+      <div>
+        <h2>Create a new house</h2>
+
+        <div class="grid2">
+          <div class="field">
+            <label>Name</label>
+            <input id="hn" placeholder="My House" />
+          </div>
+          <div class="field">
+            <label>Style</label>
+            <input id="hs" placeholder="Modern" />
+          </div>
+          <div class="field">
+            <label>Tier</label>
+            <input id="ht" placeholder="Free / Premium" />
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:10px">
+          <label>Address</label>
+          <input id="haddr" placeholder="123 Main St, Tulsa, OK" />
+          <div class="hint">We’ll convert this address into a map pin automatically.</div>
+        </div>
+
+        <details class="advanced">
+          <summary>Advanced: enter latitude/longitude manually</summary>
+          <div class="grid2" style="margin-top:10px">
+            <div class="field">
+              <label>Latitude</label>
+              <input id="hlat" placeholder="36.15398" />
+            </div>
+            <div class="field">
+              <label>Longitude</label>
+              <input id="hlng" placeholder="-95.99277" />
+            </div>
+          </div>
+          <div class="hint">If you enter lat/lng here, it will override geocoding.</div>
+        </details>
+
+        <div class="sp"></div>
+        <button id="createBtn" class="btn primary" onclick="addHouse()">Create House</button>
       </div>
     </div>
-  </header>
+  </div>
 
-  <!-- HERO -->
-  <main class="wrap">
-    <section class="hero">
-      <div class="hero-grid">
+<script>
+  // Ensure demo exists at least once
+  HomagioDB.seedDemoNear(36.15398, -95.99277, false);
+  render();
 
-        <div>
-          <div class="chip"><span class="chip-dot"></span> Premium Home Management</div>
-          <h1>Manage your home, materials, and budget — in one place.</h1>
-          <p class="subhead">
-            Homagio helps homeowners and pros capture every finish, fixture, and photo, track spending,
-            and export clean reports for projects, renovations, and inspiration.
-          </p>
+  function render(){
+    const list = document.getElementById("homesList");
+    const houses = HomagioDB.getAllHouses()
+      .sort((a,b)=> (b.updated||"").localeCompare(a.updated||""));
 
-          <!-- ✅ Working CTAs -->
-          <div class="hero-actions" id="get-started">
-            <a class="btn btn-primary" href="my.html">
-              Manage My Houses
-              <span aria-hidden="true">→</span>
-            </a>
-            <a class="btn btn-ghost" href="explore.html">Explore Homes</a>
-          </div>
-
-          <div class="trust">
-            <div class="pill"><b>Mobile-first</b> web experience</div>
-            <div class="pill"><b>Exports</b> PDF + CSV</div>
-            <div class="pill"><b>Premium</b> unlimited homes</div>
-          </div>
-        </div>
-
-        <div class="device" aria-label="App preview device">
-          <div class="device-inner">
-            <div class="device-top">
-              <span>Preview</span>
-              <span class="badge">PREMIUM</span>
-            </div>
-
-            <div class="shot">
-              <img src="assets/hero-dark.png" alt="Homagio screenshot"
-                   onerror="this.replaceWith((()=>{const d=document.createElement('div');d.className='placeholder';d.textContent='Add /assets/hero-dark.png (a screenshot like House Details)';return d;})())" />
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- FEATURES -->
-    <section id="features">
-      <h2 class="section-title">Everything you need to stay organized</h2>
-      <p class="section-sub">
-        Built to match the clean, premium experience you showed in the screenshots:
-        cards, quick actions, exports, and a simple workflow.
-      </p>
-
-      <div class="grid-3">
-        <!-- (UNCHANGED feature cards) -->
-        <div class="card">
-          <div class="icon blue" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 20v-9.5Z" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linejoin="round"/>
-              <path d="M9.5 21v-7h5v7" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Multi-home dashboard</h3>
-          <p>Track multiple homes or projects with a clear “House Details” hub and quick actions.</p>
-        </div>
-
-        <div class="card">
-          <div class="icon green" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M7 7h10v10H7V7Z" stroke="white" stroke-opacity=".9" stroke-width="2" />
-              <path d="M4 10V6a2 2 0 0 1 2-2h4" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-              <path d="M20 14v4a2 2 0 0 1-2 2h-4" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Photos + interior/exterior</h3>
-          <p>Upload and organize photos by Interior/Exterior, room, style, and materials.</p>
-        </div>
-
-        <div class="card">
-          <div class="icon gold" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M6 20h12M7.5 17.5l2.5-10h4l2.5 10" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M9 10h6" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Materials library</h3>
-          <p>Save roofing, paint, flooring, fixtures—plus brand, finish, and links for later.</p>
-        </div>
-
-        <div class="card">
-          <div class="icon blue" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M4 19V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-              <path d="M8 7h8M8 11h8M8 15h6" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Budget tracker</h3>
-          <p>Set a budget, track spent, and see progress—clean and fast like your UI comps.</p>
-        </div>
-
-        <div class="card">
-          <div class="icon green" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3v12" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-              <path d="M7 10l5 5 5-5" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M5 21h14" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Export reports</h3>
-          <p>Export PDF materials reports and shopping lists (CSV) with one tap.</p>
-        </div>
-
-        <div class="card">
-          <div class="icon gold" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7l3-7Z" stroke="white" stroke-opacity=".9" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <h3>Designed for homeowners & pros</h3>
-          <p>A single place for inspiration + tracking—great for homeowners and Pro Studio workflows.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- SCREENS -->
-    <section id="screens">
-      <h2 class="section-title">Screens that match your vision</h2>
-      <p class="section-sub">
-        Drop your real screenshots into
-        <code style="color:var(--muted);background:rgba(255,255,255,.06);padding:2px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.1)">/assets</code>
-        and this section becomes instantly “real.”
-      </p>
-
-      <div class="shots">
-        <div class="shot-tile">
-          <img src="assets/screen-1.png" alt="House Details screen" onerror="this.src='assets/hero-dark.png';" />
-          <div class="shot-caption">
-            <b>House Details</b>
-            <span>Interior/Exterior, materials at a glance, budget progress, and export actions.</span>
-          </div>
-        </div>
-
-        <div class="shot-tile">
-          <img src="assets/screen-2.png" alt="Explore screen" onerror="this.src='assets/screen-1.png';" />
-          <div class="shot-caption">
-            <b>Explore</b>
-            <span>Find inspiration by style, material, and location with clean filters.</span>
-          </div>
-        </div>
-
-        <div class="shot-tile">
-          <img src="assets/screen-3.png" alt="Add House screen" onerror="this.src='assets/screen-2.png';" />
-          <div class="shot-caption">
-            <b>Add House</b>
-            <span>Fast input flows and optional photo upload—built for quick setup.</span>
-          </div>
-        </div>
-
-        <div class="shot-tile">
-          <img src="assets/screen-4.png" alt="Materials Report screen" onerror="this.src='assets/screen-3.png';" />
-          <div class="shot-caption">
-            <b>Materials Report</b>
-            <span>Readable materials inventory with links, notes, and export-ready formatting.</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRICING -->
-    <section id="pricing">
-      <h2 class="section-title">Simple pricing</h2>
-      <p class="section-sub">Start free. Upgrade to Premium when you want unlimited homes and exports.</p>
-
-      <div class="pricing">
-        <div class="card price">
-          <div class="tag">Free</div>
-          <div class="amount">$0 <small>/ month</small></div>
-          <p class="section-sub" style="margin:0">Perfect for getting organized quickly.</p>
-          <ul class="list">
-            <li>Up to 2 houses</li>
-            <li>Materials tracking</li>
-            <li>Budget basics</li>
-            <li class="dim">PDF exports</li>
-            <li class="dim">Unlimited houses</li>
-          </ul>
-          <div style="margin-top:16px">
-            <a class="btn btn-ghost" href="my.html">Start Free</a>
-          </div>
-        </div>
-
-        <div class="card price">
-          <div class="tag" style="border-color:rgba(216,176,76,.25);background:rgba(216,176,76,.10);color:#f3e2a8;">
-            Premium <span style="color:var(--gold);font-weight:900;">•</span> Best value
-          </div>
-          <div class="amount">$9 <small>/ month</small></div>
-          <p class="section-sub" style="margin:0">For serious projects and Pro Studio workflows.</p>
-          <ul class="list">
-            <li>Unlimited houses</li>
-            <li>Export PDF Report</li>
-            <li>Export shopping list (CSV)</li>
-            <li>Advanced materials + fields</li>
-            <li>Priority Pro features (coming soon)</li>
-          </ul>
-          <div style="margin-top:16px">
-            <a class="btn btn-primary" href="my.html">Go Premium</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOR PROS -->
-    <section id="pros">
-      <div class="cta-band">
-        <div>
-          <h2>Built for homeowners <span style="color:var(--muted2)">and</span> Pro Studio users.</h2>
-          <p>
-            Homagio keeps inspiration and project tracking together—perfect for designers, builders, and architects
-            managing multiple homes and client materials.
-          </p>
-        </div>
-        <div class="actions" style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-ghost" href="explore.html">Explore</a>
-          <a class="btn btn-primary" href="my.html">Create / Manage</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- SUPPORT -->
-    <section id="support">
-      <h2 class="section-title">Support</h2>
-      <p class="section-sub">Add your support email, FAQ, and links here.</p>
-
-      <div class="grid-3">
-        <div class="card">
-          <h3>Email support</h3>
-          <p>support@homagio.com</p>
-        </div>
-        <div class="card">
-          <h3>Docs</h3>
-          <p>Quick start guides, exports, and best practices.</p>
-        </div>
-        <div class="card">
-          <h3>Roadmap</h3>
-          <p>Explore improvements to tagging, exports, and Pro Studio tools.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- FINAL CTA -->
-    <section id="signup">
-      <div class="cta-band">
-        <div>
-          <h2>Ready to organize your home?</h2>
-          <p>Start free and upgrade anytime. Keep materials, photos, and budget in one clean place.</p>
-        </div>
-        <div class="actions" style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-primary" href="my.html">Manage My Houses</a>
-          <a class="btn btn-ghost" href="explore.html">Explore Homes</a>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      <div class="foot">
-        <div>
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <div class="logo" style="width:34px;height:34px;border-radius:12px;">
-              <img src="assets/logo.png" alt="" onerror="this.remove();" />
-            </div>
-            <div>
-              <div style="font-weight:900;color:var(--text);">Homagio</div>
-              <div class="fine">Homes • Materials • Budget</div>
-            </div>
-          </div>
-          <div class="fine">© <span id="year"></span> Homagio. All rights reserved.</div>
-        </div>
-
-        <div>
-          <div style="font-weight:800;color:var(--text);margin-bottom:8px;">Product</div>
-          <div class="fine"><a href="#features">Features</a></div>
-          <div class="fine"><a href="#pricing">Pricing</a></div>
-          <div class="fine"><a href="#pros">For Pros</a></div>
-        </div>
-
-        <div>
-          <div style="font-weight:800;color:var(--text);margin-bottom:8px;">Company</div>
-          <div class="fine"><a href="#support">Support</a></div>
-          <div class="fine"><a href="my.html">My Houses</a></div>
-          <div class="fine"><a href="explore.html">Explore</a></div>
-        </div>
-      </div>
-    </footer>
-
-  </main>
-
-  <script>
-    // Mobile menu toggle + year
-    const btn = document.getElementById('menuBtn');
-    const drawer = document.getElementById('drawer');
-    if (btn && drawer) {
-      btn.addEventListener('click', () => {
-        const open = drawer.style.display === 'block';
-        drawer.style.display = open ? 'none' : 'block';
-        btn.setAttribute('aria-expanded', String(!open));
-      });
-
-      drawer.querySelectorAll('a').forEach(a => {
-        a.addEventListener('click', () => {
-          drawer.style.display = 'none';
-          btn.setAttribute('aria-expanded', 'false');
-        });
-      });
+    if(!houses.length){
+      list.innerHTML = `<div style="color:rgba(255,255,255,.7);padding:10px">
+        No houses yet. Create one below or reset demo.
+      </div>`;
+      return;
     }
-    document.getElementById('year').textContent = new Date().getFullYear();
 
-    // ✅ Seed demo once so first-time users never see an empty app
+    list.innerHTML = houses.map(h => {
+      const updated = h.updated ? new Date(h.updated).toLocaleString() : "—";
+      const name = esc(h.name || "House");
+      const style = esc(h.style || "");
+      const tier = esc(h.tier || "");
+      const addr = esc(h.address?.formatted || h.address?.raw || "");
+      return `
+        <div class="row">
+          <div style="min-width:0">
+            <b title="${name}">${name}</b>
+            <small>${style} • ${tier} • ${addr ? addr + " • " : ""}Updated ${updated}</small>
+          </div>
+          <div class="right">
+            <a class="btn" href="house.html?id=${encodeURIComponent(h.id)}&mode=view">View</a>
+            <a class="btn primary" href="house.html?id=${encodeURIComponent(h.id)}&mode=edit">Edit</a>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function openFirstOrCreate(){
+    const houses = HomagioDB.getAllHouses();
+    if(houses.length){
+      window.location.href = `house.html?id=${encodeURIComponent(houses[0].id)}&mode=edit`;
+    } else {
+      alert("Create a house first (or tap Reset Demo).");
+    }
+  }
+
+  function toast(msg){
+    const el = document.createElement("div");
+    el.textContent = msg;
+    el.style.position = "fixed";
+    el.style.left = "50%";
+    el.style.bottom = "18px";
+    el.style.transform = "translateX(-50%)";
+    el.style.background = "rgba(0,0,0,.78)";
+    el.style.border = "1px solid rgba(255,255,255,.14)";
+    el.style.color = "#fff";
+    el.style.padding = "10px 12px";
+    el.style.borderRadius = "14px";
+    el.style.boxShadow = "0 18px 50px rgba(0,0,0,.55)";
+    el.style.zIndex = "9999";
+    el.style.maxWidth = "min(520px, calc(100vw - 24px))";
+    el.style.fontSize = "13px";
+    el.style.textAlign = "center";
+    document.body.appendChild(el);
+    setTimeout(()=>{ el.style.opacity = "0"; el.style.transition="opacity .25s ease"; }, 2400);
+    setTimeout(()=>{ el.remove(); }, 2800);
+  }
+
+  async function geocodeAddress(q){
+    const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q=" + encodeURIComponent(q);
+    const res = await fetch(url, { headers: { "Accept": "application/json" } });
+    if(!res.ok) throw new Error("Geocode failed");
+    const data = await res.json();
+    if(!Array.isArray(data) || !data.length) return null;
+    const hit = data[0];
+    const lat = hit.lat ? parseFloat(hit.lat) : null;
+    const lng = hit.lon ? parseFloat(hit.lon) : null;
+    const formatted = hit.display_name || q;
+    return { lat, lng, formatted };
+  }
+
+  function setCreateBusy(on){
+    const btn = document.getElementById("createBtn");
+    if(!btn) return;
+    btn.disabled = !!on;
+    btn.textContent = on ? "Creating…" : "Create House";
+  }
+
+  async function addHouse(){
+    const name = document.getElementById("hn").value.trim() || "New House";
+    const style = document.getElementById("hs").value.trim() || "Modern";
+    const tier = document.getElementById("ht").value.trim() || "Free";
+
+    const addressRaw = (document.getElementById("haddr")?.value || "").trim();
+
+    // Optional manual override
+    const latStr = (document.getElementById("hlat")?.value || "").trim();
+    const lngStr = (document.getElementById("hlng")?.value || "").trim();
+    const hasManual = latStr !== "" && lngStr !== "" && !Number.isNaN(parseFloat(latStr)) && !Number.isNaN(parseFloat(lngStr));
+
+    let lat = null, lng = null, addressFormatted = addressRaw;
+
     try{
-      if (window.HomagioDB) {
-        HomagioDB.seedDemoNear(36.15398, -95.99277, false);
-      }
-    }catch(e){}
-  </script>
+      setCreateBusy(true);
 
+      if(hasManual){
+        lat = parseFloat(latStr);
+        lng = parseFloat(lngStr);
+      } else if(addressRaw){
+        const geo = await geocodeAddress(addressRaw);
+        if(geo){
+          lat = geo.lat;
+          lng = geo.lng;
+          addressFormatted = geo.formatted || addressRaw;
+        } else {
+          // No results — allow saving anyway
+          toast("Couldn’t find that address. Saved without a map pin.");
+        }
+      } else {
+        // No address — allow saving, but map pin will be missing
+        toast("Tip: add an address so it shows up on Explore.");
+      }
+
+      const id = HomagioDB.uid("house");
+      const house = {
+        id,
+        ownerId: "local-owner",
+        name, style, tier,
+        lat, lng,
+        address: {
+          raw: addressRaw,
+          formatted: addressFormatted || addressRaw,
+          line1: "",
+          city: "",
+          state: "",
+          zip: "",
+          country: ""
+        },
+        updated: new Date().toISOString(),
+        budget: { total: 0, spent: 0 },
+        items: {},
+        photos: []
+      };
+
+      HomagioDB.upsertHouse(house);
+
+      // Clear inputs
+      document.getElementById("hn").value = "";
+      document.getElementById("hs").value = "";
+      document.getElementById("ht").value = "";
+      if(document.getElementById("haddr")) document.getElementById("haddr").value = "";
+      if(document.getElementById("hlat")) document.getElementById("hlat").value = "";
+      if(document.getElementById("hlng")) document.getElementById("hlng").value = "";
+
+      render();
+      window.location.href = `house.html?id=${encodeURIComponent(id)}&mode=edit`;
+    } catch(e){
+      console.warn(e);
+      toast("Create failed. Try again (or save with manual lat/lng).");
+    } finally {
+      setCreateBusy(false);
+    }
+  }
+
+  function resetDemo(){
+    if(!confirm("Reset demo data? This will replace all houses in local storage.")) return;
+    HomagioDB.reset();
+    HomagioDB.seedDemoNear(36.15398, -95.99277, true);
+    render();
+  }
+
+  function esc(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+</script>
 </body>
 </html>
