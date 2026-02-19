@@ -7,8 +7,8 @@
   <meta name="description" content="Explore nearby homes around you in real time." />
   <meta name="color-scheme" content="light dark" />
 
-  <!-- Shared CSS -->
-  <link rel="stylesheet" href="/assets/styles.css" />
+  <!-- ✅ IMPORTANT: RELATIVE PATHS for GitHub Pages (/Homagio/) -->
+  <link rel="stylesheet" href="./assets/styles.css" />
 
   <!-- Leaflet -->
   <link
@@ -25,14 +25,11 @@
   ></script>
 
   <!-- Shared JS -->
-  <script defer src="/assets/core.js"></script>
-  <script defer src="/assets/db.js"></script>
-  <!-- Back-compat shim (safe) -->
-  <script defer src="/assets.db.js"></script>
+  <script defer src="./assets/core.js"></script>
+  <script defer src="./assets/db.js"></script>
 
   <style>
-    /* Explore-specific polish (kept minimal; relies on shared theme) */
-
+    /* Explore-specific polish */
     .topbar-actions{
       display:flex;
       gap:10px;
@@ -40,7 +37,6 @@
       flex-wrap:wrap;
       justify-content:flex-end;
     }
-
     .pill{
       display:inline-flex;
       align-items:center;
@@ -64,16 +60,6 @@
       background: linear-gradient(180deg, var(--blue), var(--blue2));
       box-shadow: 0 0 0 5px rgba(37,99,235,.14);
     }
-
-    .controls{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      padding: 12px 14px 0;
-    }
-
     .range{
       display:flex;
       gap:10px;
@@ -87,7 +73,6 @@
       font-weight:900;
       color: var(--text);
     }
-
     .empty{
       padding: 14px;
       border-radius: 14px;
@@ -97,7 +82,7 @@
       line-height:1.5;
     }
 
-    /* Marker label */
+    /* Zillow-ish marker label */
     .price-pin{
       display:inline-flex;
       align-items:center;
@@ -123,13 +108,9 @@
       box-shadow: 0 14px 30px rgba(37,99,235,.18);
     }
 
-    /* Make map definitely visible */
-    #map{
-      min-height: 560px;
-    }
-    @media (max-width: 980px){
-      #map{ min-height: 420px; }
-    }
+    /* Guarantee map height */
+    #map{ height: 560px; }
+    @media (max-width: 980px){ #map{ height: 420px; } }
   </style>
 </head>
 
@@ -137,15 +118,15 @@
   <!-- Top Nav -->
   <div class="nav">
     <div class="wrap nav-inner">
-      <a class="brand" href="/index.html">
+      <a class="brand" href="./index.html">
         <span class="logo-dot"></span>
         <span>Homagio</span>
       </a>
 
       <div class="nav-links">
-        <a class="link" href="/index.html">Home</a>
-        <a class="link" href="/my.html">My Houses</a>
-        <a class="link active" href="/explore.html">Explore</a>
+        <a class="link" href="./index.html">Home</a>
+        <a class="link" href="./my.html">My Houses</a>
+        <a class="link active" href="./explore.html">Explore</a>
       </div>
 
       <div class="topbar-actions">
@@ -184,7 +165,6 @@
 
     <div class="sp18"></div>
 
-    <!-- Zillow-ish split: map + right panel -->
     <div class="split">
       <div class="map-shell">
         <div id="map"></div>
@@ -223,7 +203,6 @@
   </div>
 
   <script>
-    // Explore page logic (no build step, pure static)
     (function () {
       const DEFAULT = { lat: 36.15398, lng: -95.99277, zoom: 12 }; // Tulsa-ish fallback
       const state = {
@@ -308,7 +287,7 @@
       function selectHouse(houseId, { pan = true, openPopup = true } = {}) {
         state.selectedHouseId = houseId;
         setTab("links");
-        render(); // rerender markers to highlight selection
+        render();
 
         const house = window.HomagioDB?.getHouse?.(houseId);
         if (!house) return;
@@ -322,7 +301,6 @@
 
       function renderHomesPanel(houses) {
         el.homesList.innerHTML = "";
-
         if (!houses.length) {
           el.homesEmpty.classList.remove("hide");
           return;
@@ -335,22 +313,16 @@
           div.innerHTML = `
             <div class="item-top">
               <div>
-                <div class="item-title">${window.HomagioCore ? HomagioCore.escapeHTML(h.name) : (h.name || "House")}</div>
+                <div class="item-title">${HomagioCore.escapeHTML(h.name || "House")}</div>
                 <div class="item-sub">
-                  ${(h.address ? (window.HomagioCore ? HomagioCore.escapeHTML(h.address) : h.address) : "No address")}
+                  ${(h.address ? HomagioCore.escapeHTML(h.address) : "No address")}
                   • ${h.distMi.toFixed(1)} mi
                 </div>
               </div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-                <a class="btn sm" href="/house.html?id=${encodeURIComponent(h.id)}">Open</a>
+                <a class="btn sm" href="./house.html?id=${encodeURIComponent(h.id)}">Open</a>
                 <button class="btn sm primary" data-sel="${h.id}">Select</button>
               </div>
-            </div>
-
-            <div class="sp10"></div>
-            <div class="row" style="gap:10px;">
-              <div class="badge">Style: <b style="margin-left:6px;">${window.HomagioCore ? HomagioCore.escapeHTML(h.style || "—") : (h.style || "—")}</b></div>
-              <div class="badge blue">Tier: <b style="margin-left:6px;">${window.HomagioCore ? HomagioCore.escapeHTML(h.tier || "Free") : (h.tier || "Free")}</b></div>
             </div>
           `;
           div.querySelector('button[data-sel]')?.addEventListener("click", () => selectHouse(h.id));
@@ -371,7 +343,6 @@
 
         const items = Array.isArray(house.items) ? house.items : [];
         const photos = Array.isArray(house.photos) ? house.photos : [];
-
         const photoById = new Map(photos.map(p => [p.id, p]));
         const linked = items.filter(it => (it.link && String(it.link).trim().length > 0));
 
@@ -384,7 +355,7 @@
             <b>No linked items yet.</b><br/>
             Open this home and add items with purchase links.
             <div class="sp10"></div>
-            <a class="btn sm primary" href="/house.html?id=${encodeURIComponent(house.id)}">Open ${window.HomagioCore ? HomagioCore.escapeHTML(house.name) : (house.name || "House")}</a>
+            <a class="btn sm primary" href="./house.html?id=${encodeURIComponent(house.id)}">Open ${HomagioCore.escapeHTML(house.name || "House")}</a>
           `;
           return;
         }
@@ -400,16 +371,14 @@
           card.innerHTML = `
             <div class="item-top">
               <div>
-                <div class="item-title">${window.HomagioCore ? HomagioCore.escapeHTML(it.title || "Item") : (it.title || "Item")}</div>
+                <div class="item-title">${HomagioCore.escapeHTML(it.title || "Item")}</div>
                 <div class="item-sub">
-                  ${(it.category ? (window.HomagioCore ? HomagioCore.escapeHTML(it.category) : it.category) : "Uncategorized")}
-                  ${it.brand ? " • " + (window.HomagioCore ? HomagioCore.escapeHTML(it.brand) : it.brand) : ""}
-                  ${it.finish ? " • " + (window.HomagioCore ? HomagioCore.escapeHTML(it.finish) : it.finish) : ""}
+                  ${(it.category ? HomagioCore.escapeHTML(it.category) : "Uncategorized")}
                 </div>
               </div>
               <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-                <span class="badge">${(window.HomagioCore ? HomagioCore.formatMoney(it.price || 0) : ("$" + (it.price || 0)))}</span>
-                <a class="btn sm primary" href="${window.HomagioCore ? HomagioCore.escapeHTML(it.link) : it.link}" target="_blank" rel="noopener noreferrer">Open link</a>
+                <span class="badge">${HomagioCore.formatMoney(it.price || 0)}</span>
+                <a class="btn sm primary" href="${HomagioCore.escapeHTML(it.link)}" target="_blank" rel="noopener noreferrer">Open link</a>
               </div>
             </div>
 
@@ -417,11 +386,10 @@
               <div class="sp10"></div>
               <div class="row" style="gap:10px;">
                 <div style="flex:0 0 110px;">
-                  <img src="${window.HomagioCore ? HomagioCore.escapeHTML(p.url) : p.url}" alt="" style="width:110px;height:76px;object-fit:cover;border-radius:12px;border:1px solid rgba(15,23,42,.12);" />
+                  <img src="${HomagioCore.escapeHTML(p.url)}" alt=""
+                    style="width:110px;height:76px;object-fit:cover;border-radius:12px;border:1px solid rgba(15,23,42,.12);" />
                 </div>
-                <div class="small muted2">
-                  Linked photo: ${(p.caption ? (window.HomagioCore ? HomagioCore.escapeHTML(p.caption) : p.caption) : "—")}
-                </div>
+                <div class="small muted2">Linked photo</div>
               </div>
             ` : ``}
           `;
@@ -431,11 +399,7 @@
 
       function renderMarkers(houses) {
         if (!state.map) return;
-
-        // Remove old markers
-        for (const [id, mk] of state.markers.entries()) {
-          state.map.removeLayer(mk);
-        }
+        for (const mk of state.markers.values()) state.map.removeLayer(mk);
         state.markers.clear();
 
         for (const h of houses) {
@@ -451,17 +415,17 @@
 
           mk.bindPopup(`
             <div style="min-width:220px;">
-              <div style="font-weight:900; margin-bottom:4px;">${window.HomagioCore ? HomagioCore.escapeHTML(h.name) : (h.name || "House")}</div>
+              <div style="font-weight:900; margin-bottom:4px;">${HomagioCore.escapeHTML(h.name || "House")}</div>
               <div style="color:#475569; font-size:12px; margin-bottom:10px;">
-                ${(h.address ? (window.HomagioCore ? HomagioCore.escapeHTML(h.address) : h.address) : "No address")}
+                ${(h.address ? HomagioCore.escapeHTML(h.address) : "No address")}
                 • ${h.distMi.toFixed(1)} mi
               </div>
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <a class="btn sm" href="/house.html?id=${encodeURIComponent(h.id)}">Open</a>
+                <a class="btn sm" href="./house.html?id=${encodeURIComponent(h.id)}">Open</a>
                 <button class="btn sm primary" onclick="(function(){ try{ window.__homagioSelect && window.__homagioSelect('${h.id}'); }catch(e){} })()">Select</button>
               </div>
             </div>
-          `, { closeButton: true });
+          `);
 
           mk.addTo(state.map);
           state.markers.set(h.id, mk);
@@ -475,16 +439,11 @@
         renderLinksPanel();
       }
 
-      async function initMap() {
-        // Wait for Leaflet
-        if (!window.L) {
-          setTimeout(initMap, 50);
-          return;
-        }
+      function initMap() {
+        if (!window.L) { setTimeout(initMap, 50); return; }
 
         state.map = L.map("map", { zoomControl: true, preferCanvas: true });
 
-        // Zillow-ish light tiles (CartoDB Positron)
         L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
           maxZoom: 19,
           attribution: "&copy; OpenStreetMap &copy; CARTO"
@@ -492,9 +451,7 @@
 
         state.map.setView([state.center.lat, state.center.lng], DEFAULT.zoom);
 
-        // global hook for popup button
         window.__homagioSelect = (id) => selectHouse(id);
-
         render();
       }
 
@@ -509,55 +466,46 @@
         setGPSUI(state.gpsOn);
 
         if (!state.gpsOn) {
-          window.HomagioCore?.toast?.("GPS off", "Using map center instead of your device location.", "info", 2200);
+          HomagioCore.toast("GPS off", "Using map center instead of your device location.", "info", 2200);
           return;
         }
 
         if (!navigator.geolocation) {
           state.gpsOn = false;
           setGPSUI(false);
-          window.HomagioCore?.toast?.("GPS unavailable", "Your browser/device does not support geolocation.", "bad", 3000);
+          HomagioCore.toast("GPS unavailable", "Your browser/device does not support geolocation.", "bad", 3000);
           return;
         }
 
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             state.center = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            window.HomagioCore?.toast?.("GPS on", "Centered on your current location.", "good", 2200);
+            HomagioCore.toast("GPS on", "Centered on your current location.", "good", 2200);
             recenter();
           },
-          (err) => {
+          () => {
             state.gpsOn = false;
             setGPSUI(false);
-            window.HomagioCore?.toast?.("GPS blocked", "Allow location access to use GPS mode.", "bad", 3200);
-            console.warn("GPS error", err);
+            HomagioCore.toast("GPS blocked", "Allow location access to use GPS mode.", "bad", 3200);
           },
           { enableHighAccuracy: true, timeout: 9000, maximumAge: 5000 }
         );
       }
 
       function seedDemo() {
-        try {
-          const fn = window.HomagioDB?.seedDemoNear;
-          if (typeof fn !== "function") {
-            window.HomagioCore?.toast?.("Demo unavailable", "HomagioDB.seedDemoNear not found.", "bad", 3200);
-            return;
-          }
-          fn(state.center.lat, state.center.lng, true);
-          window.HomagioCore?.toast?.("Demo homes loaded", "Sample homes added near your center.", "good", 2400);
-          setTab("homes");
-          render();
-        } catch (e) {
-          console.warn(e);
-          window.HomagioCore?.toast?.("Demo failed", "Check console for details.", "bad", 3200);
+        const fn = window.HomagioDB?.seedDemoNear;
+        if (typeof fn !== "function") {
+          HomagioCore.toast("Demo unavailable", "HomagioDB.seedDemoNear not found.", "bad", 3200);
+          return;
         }
+        fn(state.center.lat, state.center.lng, true);
+        HomagioCore.toast("Demo homes loaded", "Sample homes added near your center.", "good", 2400);
+        setTab("homes");
+        render();
       }
 
-      // Wire up UI
       document.addEventListener("DOMContentLoaded", () => {
-        // radius
-        const r = parseFloat(el.radius.value || "2");
-        state.radiusMi = Number.isFinite(r) ? r : 2.0;
+        state.radiusMi = parseFloat(el.radius.value || "2") || 2.0;
         el.radiusVal.textContent = state.radiusMi.toFixed(1);
 
         el.radius.addEventListener("input", () => {
@@ -566,20 +514,15 @@
           render();
         });
 
-        // tabs
         el.tabHomes.addEventListener("click", () => setTab("homes"));
         el.tabLinks.addEventListener("click", () => setTab("links"));
 
-        // buttons
         el.btnGPS.addEventListener("click", () => enableGPS(!state.gpsOn));
         el.btnRecenter.addEventListener("click", () => recenter());
         el.btnDemo.addEventListener("click", () => seedDemo());
 
-        // initial GPS UI
         setGPSUI(false);
         setTab("homes");
-
-        // init map
         initMap();
       });
     })();
