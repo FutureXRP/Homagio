@@ -1,20 +1,516 @@
+/* Homagio — Shared Styles (Premium Dark UI)
+   Used by: index.html, my.html, explore.html, house.html
+   Goal: consistent layout + cards + forms + buttons + panels + map scaffolding
+*/
+
 :root{
-color-scheme: dark;
---bg0:#07090d;--bg1:#0b0f16;--bg2:#0e1320;
---text:#e9eef7;--muted:#b7c0d6;--muted2:#8a94ab;
---card: rgba(255,255,255,.06);--card2: rgba(255,255,255,.08);
---border: rgba(255,255,255,.12);
---shadow: 0 12px 40px rgba(0,0,0,.55);--shadow2: 0 18px 80px rgba(0,0,0,.55);
---blue:#2d6cdf;--blue2:#1f4fb0;--green:#1fbf6a;--gold:#d8b04c;
---radius-xl: 22px;--radius-lg: 18px;--radius-md: 14px;--max: 1120px;
+  color-scheme: dark;
+
+  --bg0:#07090d;
+  --bg1:#0b0f16;
+  --bg2:#0e1320;
+
+  --text:#e9eef7;
+  --muted:#b7c0d6;
+  --muted2:#8a94ab;
+
+  --card: rgba(255,255,255,.06);
+  --card2: rgba(255,255,255,.08);
+  --border: rgba(255,255,255,.12);
+
+  --shadow: 0 12px 40px rgba(0,0,0,.55);
+  --shadow2: 0 18px 80px rgba(0,0,0,.55);
+
+  --blue:#2d6cdf;
+  --blue2:#1f4fb0;
+  --green:#1fbf6a;
+  --gold:#d8b04c;
+  --red:#ff5b6a;
+
+  --radius-xl: 22px;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --radius-sm: 12px;
+
+  --max: 1120px;
+
+  --pad: 18px;
+  --gap: 14px;
+
+  --ring: 0 0 0 5px rgba(45,108,223,.22);
+  --ring2: 0 0 0 5px rgba(31,191,106,.18);
 }
-*{box-sizing:border-box}html,body{height:100%}
-body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--text);
-background:radial-gradient(1200px 700px at 20% 10%, rgba(45,108,223,.22), transparent 60%),radial-gradient(900px 600px at 85% 30%, rgba(31,191,106,.14), transparent 55%),radial-gradient(900px 700px at 40% 110%, rgba(216,176,76,.10), transparent 55%),linear-gradient(180deg, var(--bg0), var(--bg1) 35%, var(--bg2));overflow-x:hidden;}
-body{scrollbar-color:rgba(233,238,247,.22) rgba(255,255,255,.06);}
-::-webkit-scrollbar{height:10px;width:10px}::-webkit-scrollbar-thumb{background:rgba(233,238,247,.18);border-radius:999px}::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:999px}
-a{color:inherit;text-decoration:none}img{max-width:100%;display:block}
-.wrap{width:min(var(--max),calc(100%-40px));margin:0 auto;}
-/* ... (all your original styles from the old index.html — I copied every line exactly) ... */
-.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(8,10,15,.62);border-bottom:1px solid rgba(255,255,255,.08);}
- /* FULL CSS CONTINUES — copy the entire <style> block from your old index.html (everything between <style> and </style>) and paste here, then delete the <style> tags. */
+
+*{box-sizing:border-box}
+html,body{height:100%}
+
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(45,108,223,.22), transparent 60%),
+    radial-gradient(900px 600px at 85% 30%, rgba(31,191,106,.14), transparent 55%),
+    radial-gradient(900px 700px at 40% 110%, rgba(216,176,76,.10), transparent 55%),
+    linear-gradient(180deg, var(--bg0), var(--bg1) 35%, var(--bg2));
+  overflow-x:hidden;
+}
+
+body{scrollbar-color:rgba(233,238,247,.22) rgba(255,255,255,.06)}
+::-webkit-scrollbar{height:10px;width:10px}
+::-webkit-scrollbar-thumb{background:rgba(233,238,247,.18);border-radius:999px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:999px}
+
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:18px 0}
+
+.wrap{
+  width:min(var(--max), calc(100% - 40px));
+  margin:0 auto;
+}
+
+.small{font-size:12px;color:var(--muted2)}
+.muted{color:var(--muted)}
+.muted2{color:var(--muted2)}
+
+.h1{font-size:44px;letter-spacing:-.02em;line-height:1.05;margin:0}
+.h2{font-size:26px;letter-spacing:-.01em;margin:0}
+.h3{font-size:18px;margin:0}
+.p{margin:0;color:var(--muted);line-height:1.5}
+
+.kicker{
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(45,108,223,.14);
+  border:1px solid rgba(45,108,223,.25);
+  color:#dbe7ff;
+  font-weight:600;
+  font-size:12px;
+}
+
+/* ---------------------------
+   Top Nav
+---------------------------- */
+.nav{
+  position:sticky;
+  top:0;
+  z-index:50;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(8,10,15,.62);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.nav-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 0;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  letter-spacing:-.01em;
+}
+.logo-dot{
+  width:12px;height:12px;border-radius:999px;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.55), transparent 45%),
+              linear-gradient(180deg, var(--blue), var(--blue2));
+  box-shadow: 0 0 0 6px rgba(45,108,223,.20);
+}
+.nav-links{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.nav a.link{
+  padding:8px 10px;
+  border-radius:12px;
+  color:var(--muted);
+  border:1px solid transparent;
+}
+.nav a.link:hover{
+  color:var(--text);
+  background: rgba(255,255,255,.05);
+  border-color: rgba(255,255,255,.08);
+}
+.nav a.link.active{
+  color:var(--text);
+  background: rgba(45,108,223,.14);
+  border-color: rgba(45,108,223,.24);
+  box-shadow: var(--ring);
+}
+
+/* ---------------------------
+   Buttons
+---------------------------- */
+.btn{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  cursor:pointer;
+  font-weight:700;
+  transition: transform .06s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
+  user-select:none;
+}
+.btn:hover{
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.20);
+}
+.btn:active{transform: translateY(1px)}
+.btn:focus{outline:none; box-shadow: var(--ring)}
+
+.btn.primary{
+  border-color: rgba(45,108,223,.40);
+  background: linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
+  box-shadow: 0 10px 30px rgba(45,108,223,.18);
+}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.good{
+  border-color: rgba(31,191,106,.40);
+  background: linear-gradient(180deg, rgba(31,191,106,.92), rgba(16,130,72,.92));
+  box-shadow: 0 10px 30px rgba(31,191,106,.14);
+}
+.btn.danger{
+  border-color: rgba(255,91,106,.40);
+  background: linear-gradient(180deg, rgba(255,91,106,.92), rgba(179,44,57,.92));
+  box-shadow: 0 10px 30px rgba(255,91,106,.14);
+}
+.btn.ghost{
+  background: transparent;
+}
+.btn.pill{border-radius:999px}
+.btn.sm{padding:8px 10px;border-radius:12px;font-size:13px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
+
+/* ---------------------------
+   Layout Blocks
+---------------------------- */
+.section{padding:36px 0}
+.hero{
+  padding:44px 0 26px;
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap:24px;
+  align-items:start;
+}
+@media (max-width: 980px){
+  .hero-grid{grid-template-columns: 1fr; }
+}
+.card{
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+}
+.card.pad{padding: var(--pad)}
+.card.soft{
+  background: rgba(255,255,255,.04);
+  border-color: rgba(255,255,255,.10);
+}
+.grid-2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+@media (max-width: 980px){
+  .grid-2{grid-template-columns: 1fr;}
+}
+.grid-3{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+}
+@media (max-width: 980px){
+  .grid-3{grid-template-columns: 1fr;}
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  color: var(--muted);
+  font-size:12px;
+  font-weight:700;
+}
+.badge.blue{
+  background: rgba(45,108,223,.14);
+  border-color: rgba(45,108,223,.25);
+  color:#dbe7ff;
+}
+.badge.gold{
+  background: rgba(216,176,76,.10);
+  border-color: rgba(216,176,76,.22);
+  color:#ffecc3;
+}
+
+/* ---------------------------
+   Forms
+---------------------------- */
+label{
+  display:block;
+  font-size:12px;
+  color: var(--muted2);
+  margin: 10px 0 6px;
+  font-weight:700;
+}
+.input, select, textarea{
+  width:100%;
+  padding:11px 12px;
+  border-radius: 14px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: var(--text);
+  outline:none;
+}
+textarea{min-height: 92px; resize: vertical}
+.input:focus, select:focus, textarea:focus{
+  border-color: rgba(45,108,223,.35);
+  box-shadow: var(--ring);
+}
+.row{
+  display:flex;
+  gap: 12px;
+  align-items:center;
+}
+.row > *{flex:1}
+@media (max-width: 780px){
+  .row{flex-direction:column; align-items:stretch}
+}
+
+/* radios/toggles */
+.seg{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: var(--muted);
+  cursor:pointer;
+  user-select:none;
+  font-weight:800;
+  font-size:12px;
+}
+.chip[data-on="1"]{
+  color: var(--text);
+  border-color: rgba(45,108,223,.28);
+  background: rgba(45,108,223,.14);
+  box-shadow: var(--ring);
+}
+
+/* ---------------------------
+   Lists / Cards
+---------------------------- */
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.item-card{
+  padding:14px;
+  border-radius: var(--radius-lg);
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+}
+.item-card:hover{
+  border-color: rgba(255,255,255,.20);
+  background: rgba(255,255,255,.06);
+}
+.item-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.item-title{
+  font-weight:900;
+  letter-spacing:-.01em;
+}
+.item-sub{
+  color: var(--muted2);
+  font-size:12px;
+  margin-top:4px;
+}
+.kv{
+  display:grid;
+  grid-template-columns: 120px 1fr;
+  gap:10px;
+  font-size:13px;
+  color: var(--muted);
+}
+.kv b{color: var(--text)}
+
+/* ---------------------------
+   Explore Map Layout Helpers
+---------------------------- */
+.split{
+  display:grid;
+  grid-template-columns: 1.3fr .7fr;
+  gap: 14px;
+  align-items:stretch;
+}
+@media (max-width: 980px){
+  .split{grid-template-columns: 1fr;}
+}
+.map-shell{
+  border-radius: var(--radius-xl);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  min-height: 560px;
+  box-shadow: var(--shadow);
+}
+#map{
+  width:100%;
+  height: 560px;
+  background: rgba(255,255,255,.03);
+}
+@media (max-width: 980px){
+  .map-shell{min-height: 420px}
+  #map{height: 420px}
+}
+.panel{
+  border-radius: var(--radius-xl);
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height: 560px;
+}
+.panel-h{
+  padding: 14px 14px 12px;
+  border-bottom:1px solid rgba(255,255,255,.10);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.tabs{
+  display:flex;
+  gap:8px;
+  padding: 8px;
+  background: rgba(255,255,255,.03);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.tab{
+  flex:1;
+  text-align:center;
+  padding:10px 10px;
+  border-radius: 14px;
+  font-weight:900;
+  color: var(--muted);
+  border:1px solid transparent;
+  cursor:pointer;
+}
+.tab[data-on="1"]{
+  color: var(--text);
+  background: rgba(45,108,223,.14);
+  border-color: rgba(45,108,223,.24);
+  box-shadow: var(--ring);
+}
+.panel-b{
+  padding: 14px;
+  overflow:auto;
+  flex:1;
+}
+
+/* ---------------------------
+   Toasts
+---------------------------- */
+.toast-wrap{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+  z-index: 9999;
+}
+.toast{
+  width: min(420px, calc(100vw - 32px));
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(15,18,28,.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow2);
+  padding: 12px 12px;
+  display:flex;
+  gap: 10px;
+  align-items:flex-start;
+}
+.toast .dot{
+  width: 10px; height: 10px; border-radius: 999px; margin-top: 4px;
+  background: linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
+  box-shadow: 0 0 0 6px rgba(45,108,223,.18);
+}
+.toast.good .dot{background: linear-gradient(180deg, rgba(31,191,106,.92), rgba(16,130,72,.92)); box-shadow: 0 0 0 6px rgba(31,191,106,.14);}
+.toast.bad .dot{background: linear-gradient(180deg, rgba(255,91,106,.92), rgba(179,44,57,.92)); box-shadow: 0 0 0 6px rgba(255,91,106,.14);}
+.toast .t{
+  font-weight: 900;
+}
+.toast .m{
+  color: var(--muted);
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* ---------------------------
+   Leaflet tweaks (safe)
+---------------------------- */
+.leaflet-control-zoom a{
+  background: rgba(10,12,18,.72) !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+}
+.leaflet-control-zoom a:hover{
+  background: rgba(255,255,255,.08) !important;
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{
+  background: rgba(10,12,18,.92) !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+}
+.leaflet-container a{color:#dbe7ff}
+
+/* ---------------------------
+   Utility
+---------------------------- */
+.hide{display:none !important}
+.center{display:grid;place-items:center}
+.sp10{height:10px}
+.sp14{height:14px}
+.sp18{height:18px}
+.sp24{height:24px}
