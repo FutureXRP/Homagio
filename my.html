@@ -2,46 +2,49 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Houses • Homagio</title>
 <link rel="stylesheet" href="assets/styles.css">
 <script src="assets.db.js"></script>
-<style>/* tiny page-specific overrides if needed */ .house-card{cursor:pointer;transition:.2s;} .house-card:hover{transform:scale(1.02);}</style>
 </head>
 <body>
-<header class="nav"> <!-- exact same nav as landing, with active "My Houses" highlight --></header>
+<header class="nav">
+<div class="wrap nav-inner">
+<a class="brand" href="index.html"><div class="logo"><img src="assets/logo.png" onerror="this.remove();this.parentElement.style.background='linear-gradient(145deg, rgba(45,108,223,.7), rgba(31,191,106,.35))';"></div><div class="brand-name"><b>Homagio</b><span>Homes • Materials • Budget</span></div></a>
+<nav class="nav-links"><a href="explore.html">Explore</a><a href="my.html" style="background:rgba(255,255,255,.08);color:var(--text)">My Houses</a></nav>
+<div class="nav-cta"><a href="explore.html" class="btn btn-ghost">Explore</a><button class="menu" id="menuBtn">☰</button></div>
+</div>
+<div class="drawer" id="drawer"><div class="wrap"><a href="explore.html">Explore</a><a href="my.html">My Houses</a></div></div>
+</header>
 
-<main class="wrap" style="padding:40px 0">
+<main class="wrap" style="padding:60px 0 100px">
 <h1 class="section-title">My Houses</h1>
-<button onclick="createNewHouse()" class="btn btn-primary" style="margin-bottom:30px">+ New House</button>
-
-<div id="housesList" class="grid-3"></div>
+<button onclick="createNewHouse()" class="btn btn-primary" style="margin-bottom:30px">+ Create New House</button>
+<div id="housesGrid" class="grid-3"></div>
 </main>
 
 <script>
-async function loadMyHouses() {
-  const db = window.HomagioDB || (await import('./assets.db.js')).default; // fallback
-  const houses = Object.values(db.getAllHouses ? db.getAllHouses() : {});
-  const container = document.getElementById('housesList');
-  container.innerHTML = houses.length ? '' : '<p style="grid-column:1/-1;color:var(--muted)">No houses yet. Create one above!</p>';
+const btn = document.getElementById('menuBtn'); const drawer = document.getElementById('drawer');
+if(btn&&drawer){btn.addEventListener('click',()=>{const o=drawer.style.display==='block';drawer.style.display=o?'none':'block';});}
 
+function loadMyHouses(){
+  const houses = Object.values(window.HomagioDB.getAllHouses ? window.HomagioDB.getAllHouses() : {});
+  const grid = document.getElementById('housesGrid');
+  grid.innerHTML = houses.length ? '' : '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:60px">No houses yet.<br>Create your first one above!</p>';
   houses.forEach(h => {
-    const card = document.createElement('div');
-    card.className = 'card house-card';
-    card.innerHTML = `
-      <h3>${h.name || 'Untitled House'}</h3>
-      <p>${h.address?.formatted || 'No address'}</p>
-      <p style="font-size:13px;color:var(--muted2)">Budget: $${h.budget?.spent || 0} / $${h.budget?.total || 0}</p>
-    `;
-    card.onclick = () => { window.HomagioDB.setCurrentHouse(h.id); location.href = 'house.html'; };
-    container.appendChild(card);
+    const c = document.createElement('div');
+    c.className = 'card';
+    c.style.cursor = 'pointer';
+    c.innerHTML = `<h3>${h.name||'Untitled'}</h3><p style="color:var(--muted)">${h.address?.formatted||h.address?.raw||'No address'}</p><p style="font-size:13px">Budget $${(h.budget?.spent||0).toLocaleString()} / $${(h.budget?.total||0).toLocaleString()}</p>`;
+    c.onclick = () => { window.HomagioDB.setCurrentHouse(h.id); location.href='house.html'; };
+    grid.appendChild(c);
   });
 }
 
-function createNewHouse() {
-  const name = prompt("House name (e.g. 'My Dream Reno')") || "New House";
-  const address = prompt("Address (optional)") || "";
-  window.HomagioDB.createHouse({name, address: {raw: address, formatted: address}});
+function createNewHouse(){
+  const name = prompt("House name?", "My Tulsa Home") || "New House";
+  const addr = prompt("Address?", "1234 S Main St, Tulsa, OK 74105") || "";
+  window.HomagioDB.createHouse({name, address:{raw:addr,formatted:addr}, lat:36.154, lng:-95.993, budget:{total:65000,spent:18750}});
   loadMyHouses();
 }
 
