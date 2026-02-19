@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Explore Homes • Homagio</title>
 <link rel="stylesheet" href="assets/styles.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -10,37 +10,35 @@
 <script src="assets.db.js"></script>
 </head>
 <body>
-<header class="nav"> <!-- same premium nav --></header>
+<header class="nav"> <!-- SAME PREMIUM NAV AS ABOVE - copy the <header> block from my.html if you want --> </header>
 
-<main class="wrap">
-<div style="height:70vh;border-radius:22px;overflow:hidden;margin:30px 0;box-shadow:var(--shadow2)" id="map"></div>
-<button onclick="toggleGPS()" class="btn btn-ghost">Toggle GPS Simulation</button>
+<main class="wrap" style="padding:40px 0">
+<div id="map" style="height:65vh;border-radius:22px;overflow:hidden;box-shadow:var(--shadow2);margin-bottom:20px"></div>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<button onclick="recenterMap()" class="btn btn-ghost">Recenter on Tulsa</button>
+<button onclick="toggleFakeGPS()" class="btn btn-ghost">Toggle GPS</button>
+</div>
 </main>
 
 <script>
-let map, markers = [];
-function initMap() {
-  map = L.map('map').setView([36.154, -95.993], 14);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap'}).addTo(map);
-
+let map;
+function initMap(){
+  map = L.map('map').setView([36.154, -95.993], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+  
   const houses = Object.values(window.HomagioDB.getAllHouses ? window.HomagioDB.getAllHouses() : {});
   houses.forEach(h => {
-    if (h.lat && h.lng) {
-      const marker = L.marker([h.lat, h.lng]).addTo(map);
-      marker.bindPopup(`<b>${h.name}</b><br><a href="house.html" onclick="openHouse('${h.id}');return false">Open House →</a>`);
-      markers.push(marker);
+    if(h.lat && h.lng){
+      L.marker([h.lat, h.lng]).addTo(map)
+       .bindPopup(`<b>${h.name}</b><br><a href="#" onclick="openHouse('${h.id}');return false">Open House →</a>`);
     }
   });
 }
+function openHouse(id){ window.HomagioDB.setCurrentHouse(id); location.href='house.html'; }
+function recenterMap(){ map.flyTo([36.154,-95.993],13); }
+function toggleFakeGPS(){ alert('GPS simulation active – all demo pins are already loaded!'); }
 
-function openHouse(id) {
-  window.HomagioDB.setCurrentHouse(id);
-  location.href = 'house.html';
-}
-
-function toggleGPS() { alert("GPS simulation active (demo only) — pins are already shown!"); }
-
-initMap();
+window.onload = initMap;
 </script>
 </body>
 </html>
