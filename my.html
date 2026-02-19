@@ -1,288 +1,51 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Homagio — My Houses</title>
-  <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#07090d" />
-
-  <!-- ✅ FIX: correct DB path for GitHub Pages -->
-  <script src="assets.db.js"></script>
-
-  <style>
-    :root{
-      color-scheme: dark;
-      --bg0:#07090d; --bg1:#0b0f16; --bg2:#0e1320;
-      --text:#e9eef7; --muted:#b7c0d6; --muted2:#8a94ab;
-      --shadow: 0 12px 40px rgba(0,0,0,.55);
-      --blue:#2d6cdf; --blue2:#1f4fb0; --green:#1fbf6a;
-      --max: 980px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0}
-    body{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background:
-        radial-gradient(1200px 700px at 20% 10%, rgba(45,108,223,.18), transparent 60%),
-        radial-gradient(900px 600px at 85% 30%, rgba(31,191,106,.12), transparent 55%),
-        linear-gradient(180deg, var(--bg0), var(--bg1) 35%, var(--bg2));
-      color:var(--text);
-    }
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:var(--max);margin:0 auto;padding:14px}
-    .top{
-      position:sticky;top:0;z-index:20;
-      backdrop-filter: blur(14px);
-      background: rgba(8,10,15,.62);
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .topInner{max-width:var(--max);margin:0 auto;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{
-      width:34px;height:34px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(145deg, rgba(45,108,223,.7), rgba(31,191,106,.35));
-      box-shadow: 0 10px 22px rgba(0,0,0,.35);
-    }
-    .brand b{display:block;font-size:14px;font-weight:900}
-    .brand span{display:block;font-size:12px;color:var(--muted2);margin-top:2px}
-
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:10px 12px;border-radius:14px;
-      font-weight:900;font-size:13px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      cursor:pointer;user-select:none;
-    }
-    .btn:active{transform:scale(.98)}
-    .btn.primary{
-      background: linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
-      border-color: rgba(255,255,255,.12);
-    }
-
-    .card{
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      box-shadow: var(--shadow);
-      padding:14px;
-      margin: 14px 0;
-    }
-    .h1{font-size:22px;font-weight:950}
-    .sub{color:var(--muted2);font-size:13px;margin-top:6px;line-height:1.5}
-
-    .grid{display:grid;gap:10px}
-    .row{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:12px;border-radius:16px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.05);
-    }
-    .row b{display:block;font-size:14px;font-weight:950}
-    .row small{display:block;color:var(--muted2);margin-top:2px;font-size:12px}
-    .row .right{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      color: var(--muted);
-      font-size: 12px;font-weight:900;
-    }
-
-    .form{display:grid;gap:10px;margin-top:12px}
-    .field label{display:block;color:var(--muted2);font-size:12px;font-weight:900;margin-bottom:6px}
-    .field input{
-      width:100%;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      font-weight:800;
-    }
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media (max-width:560px){ .grid2{grid-template-columns:1fr} }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Houses • Homagio</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets.db.js"></script>
+<style>/* tiny page-specific overrides if needed */ .house-card{cursor:pointer;transition:.2s;} .house-card:hover{transform:scale(1.02);}</style>
 </head>
-
 <body>
-  <header class="top">
-    <div class="topInner">
-      <a class="brand" href="index.html">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <b>Homagio</b>
-          <span>Owner dashboard</span>
-        </div>
-      </a>
+<header class="nav"> <!-- exact same nav as landing, with active "My Houses" highlight --></header>
 
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-        <a class="btn" href="explore.html">Explore</a>
-        <button class="btn" onclick="resetDemo()">Reset Demo</button>
-        <button class="btn primary" onclick="openFirstOrCreate()">Open My House</button>
-      </div>
-    </div>
-  </header>
+<main class="wrap" style="padding:40px 0">
+<h1 class="section-title">My Houses</h1>
+<button onclick="createNewHouse()" class="btn btn-primary" style="margin-bottom:30px">+ New House</button>
 
-  <div class="wrap">
-    <div class="card">
-      <div class="h1">My Houses</div>
-      <div class="sub">
-        This is the <b>owner</b> side. From here you can edit homes (photos, materials, budgets).
-        Use <b>Explore</b> to browse others.
-      </div>
-
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-        <div class="pill">Mode: Owner</div>
-        <div class="pill">Storage: Local (MVP)</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="h1">Your homes</div>
-      <div class="sub">Tap a home to open it. Use “Edit” to change photos/materials.</div>
-      <div class="grid" id="homesList" style="margin-top:12px"></div>
-    </div>
-
-    <div class="card">
-      <div class="h1">Add a new house</div>
-      <div class="sub">For now this saves locally. Later we’ll swap to Firebase with accounts.</div>
-
-      <div class="form">
-        <div class="field">
-          <label>House name</label>
-          <input id="hn" placeholder="Blair Family Home" />
-        </div>
-
-        <div class="grid2">
-          <div class="field">
-            <label>Style</label>
-            <input id="hs" placeholder="Modern" />
-          </div>
-          <div class="field">
-            <label>Tier</label>
-            <input id="ht" placeholder="Free / Premium" />
-          </div>
-        </div>
-
-        <!-- ✅ NEW: Address instead of Lat/Lng -->
-        <div class="field">
-          <label>Address</label>
-          <input id="haddr" placeholder="123 Main St, Tulsa, OK 74133" />
-        </div>
-
-        <button class="btn primary" onclick="addHouse()">Create House</button>
-      </div>
-    </div>
-  </div>
+<div id="housesList" class="grid-3"></div>
+</main>
 
 <script>
-  // Ensure demo exists at least once
-  HomagioDB.seedDemoNear(36.15398, -95.99277, false);
-  render();
+async function loadMyHouses() {
+  const db = window.HomagioDB || (await import('./assets.db.js')).default; // fallback
+  const houses = Object.values(db.getAllHouses ? db.getAllHouses() : {});
+  const container = document.getElementById('housesList');
+  container.innerHTML = houses.length ? '' : '<p style="grid-column:1/-1;color:var(--muted)">No houses yet. Create one above!</p>';
 
-  function render(){
-    const list = document.getElementById("homesList");
-    const houses = (HomagioDB.getAllHouses() || [])
-      .sort((a,b)=> (b.updated||"").localeCompare(a.updated||""));
+  houses.forEach(h => {
+    const card = document.createElement('div');
+    card.className = 'card house-card';
+    card.innerHTML = `
+      <h3>${h.name || 'Untitled House'}</h3>
+      <p>${h.address?.formatted || 'No address'}</p>
+      <p style="font-size:13px;color:var(--muted2)">Budget: $${h.budget?.spent || 0} / $${h.budget?.total || 0}</p>
+    `;
+    card.onclick = () => { window.HomagioDB.setCurrentHouse(h.id); location.href = 'house.html'; };
+    container.appendChild(card);
+  });
+}
 
-    if(!houses.length){
-      list.innerHTML = `<div style="color:rgba(255,255,255,.7);padding:10px">
-        No houses yet. Create one below or reset demo.
-      </div>`;
-      return;
-    }
+function createNewHouse() {
+  const name = prompt("House name (e.g. 'My Dream Reno')") || "New House";
+  const address = prompt("Address (optional)") || "";
+  window.HomagioDB.createHouse({name, address: {raw: address, formatted: address}});
+  loadMyHouses();
+}
 
-    list.innerHTML = houses.map(h => {
-      const updated = h.updated ? new Date(h.updated).toLocaleString() : "—";
-      const name = esc(h.name || "House");
-      const style = esc(h.style || "");
-      const tier = esc(h.tier || "");
-      const addr = esc((h.address?.formatted || h.address?.raw || "").trim());
-      const hasPin = Number.isFinite(Number(h.lat)) && Number.isFinite(Number(h.lng));
-
-      return `
-        <div class="row">
-          <div style="min-width:0">
-            <b title="${name}">${name}</b>
-            <small>
-              ${style} • ${tier} • Updated ${updated}
-              ${addr ? ` • ${addr}` : ``}
-              ${hasPin ? `` : ` • <span style="color:rgba(255,220,120,.95);font-weight:900">Needs pin</span>`}
-            </small>
-          </div>
-          <div class="right">
-            <a class="btn" href="house.html?id=${encodeURIComponent(h.id)}&mode=view&from=my">View</a>
-            <a class="btn primary" href="house.html?id=${encodeURIComponent(h.id)}&mode=edit&from=my">Edit</a>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  function openFirstOrCreate(){
-    const houses = HomagioDB.getAllHouses() || [];
-    if(houses.length){
-      window.location.href = `house.html?id=${encodeURIComponent(houses[0].id)}&mode=edit&from=my`;
-    } else {
-      alert("Create a house first (or tap Reset Demo).");
-    }
-  }
-
-  function addHouse(){
-    const name = document.getElementById("hn").value.trim() || "New House";
-    const style = document.getElementById("hs").value.trim() || "Modern";
-    const tier = document.getElementById("ht").value.trim() || "Free";
-    const rawAddr = document.getElementById("haddr").value.trim();
-
-    const id = HomagioDB.uid("house");
-
-    // NOTE: We intentionally do NOT geocode yet (no API keys needed for MVP).
-    // Explore will show it as "Needs pin" until we add a geocoding step.
-    const house = {
-      id,
-      ownerId: "local-owner",
-      name, style, tier,
-      address: rawAddr ? { raw: rawAddr, formatted: rawAddr } : null,
-      lat: null,
-      lng: null,
-      updated: new Date().toISOString(),
-      budget: { total: 0, spent: 0 },
-      items: {},
-      photos: []
-    };
-
-    HomagioDB.upsertHouse(house);
-
-    // Clear inputs
-    document.getElementById("hn").value = "";
-    document.getElementById("hs").value = "";
-    document.getElementById("ht").value = "";
-    document.getElementById("haddr").value = "";
-
-    render();
-
-    // Open in edit mode (owner), return should go back to My Houses
-    window.location.href = `house.html?id=${encodeURIComponent(id)}&mode=edit&from=my`;
-  }
-
-  function resetDemo(){
-    if(!confirm("Reset demo data? This will replace all houses in local storage.")) return;
-    HomagioDB.resetDemo(36.15398, -95.99277);
-    render();
-  }
-
-  function esc(s){
-    return String(s ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
+loadMyHouses();
 </script>
 </body>
 </html>
