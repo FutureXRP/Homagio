@@ -8,7 +8,8 @@
 <meta name="color-scheme" content="dark" />
 <meta name="theme-color" content="#07090d" />
 
-<script src="assets/db.js"></script>
+<!-- ✅ FIX: correct DB file path -->
+<script src="assets.db.js"></script>
 
 <style>
 :root{
@@ -361,7 +362,7 @@ function switchTab(e, tab){
   $tabBadge.textContent = tab === "interior" ? "Interior" : "Exterior";
 
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  const target = e?.target || document.querySelector(`.tab[data-tab="${tab}"]`);
+  const target = e?.target || document.querySelector(\`.tab[data-tab="\${tab}"]\`);
   if (target) target.classList.add("active");
 
   selectedPhotoId = null;
@@ -533,7 +534,7 @@ async function savePhoto(){
   closeModal();
   activeTab = tab;
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add("active");
+  document.querySelector(\`.tab[data-tab="\${tab}"]\`)?.classList.add("active");
   $tabBadge.textContent = tab === "interior" ? "Interior" : "Exterior";
   renderPhotos();
 }
@@ -716,7 +717,7 @@ function savePhotoEdit(photoId){
   // If it moved tabs, update view
   activeTab = tab;
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add("active");
+  document.querySelector(\`.tab[data-tab="\${tab}"]\`)?.classList.add("active");
   $tabBadge.textContent = tab === "interior" ? "Interior" : "Exterior";
 
   renderPhotos();
