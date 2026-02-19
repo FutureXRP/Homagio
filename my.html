@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Homagio — My Houses</title>
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#07090d" />
+  <script src="assets/db.js"></script>
+
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg0:#07090d; --bg1:#0b0f16; --bg2:#0e1320;
+      --text:#e9eef7; --muted:#b7c0d6; --muted2:#8a94ab;
+      --shadow: 0 12px 40px rgba(0,0,0,.55);
+      --blue:#2d6cdf; --blue2:#1f4fb0; --green:#1fbf6a;
+      --max: 980px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(45,108,223,.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 30%, rgba(31,191,106,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 35%, var(--bg2));
+      color:var(--text);
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:var(--max);margin:0 auto;padding:14px}
+    .top{
+      position:sticky;top:0;z-index:20;
+      backdrop-filter: blur(14px);
+      background: rgba(8,10,15,.62);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .topInner{max-width:var(--max);margin:0 auto;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{
+      width:34px;height:34px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(145deg, rgba(45,108,223,.7), rgba(31,191,106,.35));
+      box-shadow: 0 10px 22px rgba(0,0,0,.35);
+    }
+    .brand b{display:block;font-size:14px;font-weight:900}
+    .brand span{display:block;font-size:12px;color:var(--muted2);margin-top:2px}
+
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 12px;border-radius:14px;
+      font-weight:900;font-size:13px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;user-select:none;
+    }
+    .btn:active{transform:scale(.98)}
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
+      border-color: rgba(255,255,255,.12);
+    }
+
+    .card{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      box-shadow: var(--shadow);
+      padding:14px;
+      margin: 14px 0;
+    }
+    .h1{font-size:22px;font-weight:950}
+    .sub{color:var(--muted2);font-size:13px;margin-top:6px;line-height:1.5}
+
+    .grid{display:grid;gap:10px}
+    .row{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+    }
+    .row b{display:block;font-size:14px;font-weight:950}
+    .row small{display:block;color:var(--muted2);margin-top:2px;font-size:12px}
+    .row .right{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size: 12px;font-weight:900;
+    }
+
+    .form{display:grid;gap:10px;margin-top:12px}
+    .field label{display:block;color:var(--muted2);font-size:12px;font-weight:900;margin-bottom:6px}
+    .field input{
+      width:100%;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:800;
+    }
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:560px){ .grid2{grid-template-columns:1fr} }
+  </style>
+</head>
+
+<body>
+  <header class="top">
+    <div class="topInner">
+      <a class="brand" href="index.html">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <b>Homagio</b>
+          <span>Owner dashboard</span>
+        </div>
+      </a>
+
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+        <a class="btn" href="explore.html">Explore</a>
+        <button class="btn" onclick="resetDemo()">Reset Demo</button>
+        <button class="btn primary" onclick="openFirstOrCreate()">Open My House</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="h1">My Houses</div>
+      <div class="sub">
+        This is the <b>owner</b> side. From here you can edit homes (photos, materials, budgets).
+        Use <b>Explore</b> to browse others.
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+        <div class="pill">Mode: Owner</div>
+        <div class="pill">Storage: Local (MVP)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="h1">Your homes</div>
+      <div class="sub">Tap a home to open it. Use “Edit” to change photos/materials.</div>
+      <div class="grid" id="homesList" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="h1">Add a new house</div>
+      <div class="sub">For now this saves locally. Later we’ll swap to Firebase with accounts.</div>
+
+      <div class="form">
+        <div class="field">
+          <label>House name</label>
+          <input id="hn" placeholder="Blair Family Home" />
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label>Style</label>
+            <input id="hs" placeholder="Modern" />
+          </div>
+          <div class="field">
+            <label>Tier</label>
+            <input id="ht" placeholder="Free / Premium" />
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label>Latitude</label>
+            <input id="hlat" placeholder="36.15398" />
+          </div>
+          <div class="field">
+            <label>Longitude</label>
+            <input id="hlng" placeholder="-95.99277" />
+          </div>
+        </div>
+
+        <button class="btn primary" onclick="addHouse()">Create House</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Ensure demo exists at least once
+  HomagioDB.seedDemoNear(36.15398, -95.99277, false);
+  render();
+
+  function render(){
+    const list = document.getElementById("homesList");
+    const houses = HomagioDB.getAllHouses()
+      .sort((a,b)=> (b.updated||"").localeCompare(a.updated||""));
+
+    if(!houses.length){
+      list.innerHTML = `<div style="color:rgba(255,255,255,.7);padding:10px">
+        No houses yet. Create one below or reset demo.
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = houses.map(h => {
+      const updated = h.updated ? new Date(h.updated).toLocaleString() : "—";
+      const name = esc(h.name || "House");
+      const style = esc(h.style || "");
+      const tier = esc(h.tier || "");
+      return `
+        <div class="row">
+          <div style="min-width:0">
+            <b title="${name}">${name}</b>
+            <small>${style} • ${tier} • Updated ${updated}</small>
+          </div>
+          <div class="right">
+            <a class="btn" href="house.html?id=${encodeURIComponent(h.id)}&mode=view">View</a>
+            <a class="btn primary" href="house.html?id=${encodeURIComponent(h.id)}&mode=edit">Edit</a>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function openFirstOrCreate(){
+    const houses = HomagioDB.getAllHouses();
+    if(houses.length){
+      window.location.href = `house.html?id=${encodeURIComponent(houses[0].id)}&mode=edit`;
+    } else {
+      alert("Create a house first (or tap Reset Demo).");
+    }
+  }
+
+  function addHouse(){
+    const name = document.getElementById("hn").value.trim() || "New House";
+    const style = document.getElementById("hs").value.trim() || "Modern";
+    const tier = document.getElementById("ht").value.trim() || "Free";
+
+    const lat = parseFloat(document.getElementById("hlat").value.trim() || "36.15398");
+    const lng = parseFloat(document.getElementById("hlng").value.trim() || "-95.99277");
+
+    const id = HomagioDB.uid("house");
+    const house = {
+      id,
+      ownerId: "local-owner",
+      name, style, tier,
+      lat, lng,
+      updated: new Date().toISOString(),
+      budget: { total: 0, spent: 0 },
+      items: {},
+      photos: []
+    };
+
+    HomagioDB.upsertHouse(house);
+
+    // Clear inputs
+    document.getElementById("hn").value = "";
+    document.getElementById("hs").value = "";
+    document.getElementById("ht").value = "";
+    document.getElementById("hlat").value = "";
+    document.getElementById("hlng").value = "";
+
+    render();
+    window.location.href = `house.html?id=${encodeURIComponent(id)}&mode=edit`;
+  }
+
+  function resetDemo(){
+    if(!confirm("Reset demo data? This will replace all houses in local storage.")) return;
+    HomagioDB.resetDemo(36.15398, -95.99277);
+    render();
+  }
+
+  function esc(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+</script>
+</body>
+</html>
