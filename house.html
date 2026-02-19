@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="dark" />
 <meta name="theme-color" content="#07090d" />
 
-<!-- ✅ FIX: correct DB file path -->
+<!-- ✅ correct DB file path -->
 <script src="assets.db.js"></script>
 
 <style>
@@ -17,6 +17,8 @@
   --bg0:#07090d; --bg1:#0b0f16; --bg2:#0e1320;
   --text:#e9eef7; --muted:#b7c0d6; --muted2:#8a94ab;
   --shadow: 0 12px 40px rgba(0,0,0,.55);
+  --blue:#2d6cdf; --blue2:#1f4fb0; --green:#1fbf6a;
+  --warn:#ffcf5a;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -54,6 +56,12 @@ a{text-decoration:none;color:inherit}
   background:rgba(255,255,255,.06);
   font-size:12px;color:var(--muted);
   width:max-content;
+}
+.badge.warn{
+  border-color: rgba(255,207,90,.28);
+  background: rgba(255,207,90,.10);
+  color: rgba(255,207,90,.95);
+  font-weight:900;
 }
 
 .wrap{max-width:1000px;margin:auto;padding:14px}
@@ -226,13 +234,14 @@ hr.sep{border:none;border-top:1px solid rgba(255,255,255,.08);margin:12px 0}
 <body>
 <div class="header">
   <div class="header-inner">
-    <a class="back" href="explore.html">← Back</a>
+    <a class="back" id="backBtn" href="explore.html">← Back</a>
     <div>
       <div class="title" id="houseName">House</div>
       <div class="sub" id="houseStyle"></div>
       <div class="badges">
         <div class="badge" id="modeBadge">Mode: View</div>
         <div class="badge" id="tabBadge">Interior</div>
+        <div class="badge" id="pinBadge" style="display:none">Pinned</div>
       </div>
     </div>
   </div>
@@ -256,6 +265,7 @@ hr.sep{border:none;border-top:1px solid rgba(255,255,255,.08);margin:12px 0}
       <div class="details-tools" id="detailsTools" style="display:none">
         <div class="btn small" onclick="openLinkModal()">+ Link item</div>
         <div class="btn small" onclick="openPhotoEditModal()">Edit photo</div>
+        <div class="btn small" onclick="openAddressModal()">Set Address / Pin</div>
       </div>
     </div>
     <hr class="sep"/>
@@ -287,15 +297,18 @@ hr.sep{border:none;border-top:1px solid rgba(255,255,255,.08);margin:12px 0}
 const params = new URLSearchParams(window.location.search);
 const mode = (params.get("mode") || "view").toLowerCase() === "edit" ? "edit" : "view";
 const houseId = params.get("id") || "demo-0";
+const from = (params.get("from") || "").toLowerCase(); // "my" or ""
 
 let house = null;
 let activeTab = "interior";
 let selectedPhotoId = null;
 
+const $backBtn = document.getElementById("backBtn");
 const $houseName = document.getElementById("houseName");
 const $houseStyle = document.getElementById("houseStyle");
 const $modeBadge = document.getElementById("modeBadge");
 const $tabBadge = document.getElementById("tabBadge");
+const $pinBadge = document.getElementById("pinBadge");
 const $photos = document.getElementById("photos");
 const $detailsTitle = document.getElementById("detailsTitle");
 const $detailsSub = document.getElementById("detailsSub");
@@ -312,18 +325,25 @@ const $modal = document.getElementById("modalBody");
 init();
 
 function init(){
+  // Back routing
+  $backBtn.href = (from === "my") ? "my.html" : "explore.html";
+
   // Ensure demo exists if someone deep-links to demo-0
   HomagioDB.seedDemoNear(36.15398, -95.99277, false);
 
-  house = HomagioDB.getHouse(houseId);
-  if(!house){
-    // fallback
-    house = HomagioDB.getHouse("demo-0");
-  }
+  house = HomagioDB.getHouse(houseId) || HomagioDB.getHouse("demo-0");
 
   $houseName.textContent = house?.name || "House";
-  $houseStyle.textContent = house?.style || "";
+
+  const styleBits = [];
+  if (house?.style) styleBits.push(house.style);
+  const addr = (house?.address?.formatted || house?.address?.raw || "").trim();
+  if (addr) styleBits.push(addr);
+  $houseStyle.textContent = styleBits.join(" • ");
+
   $modeBadge.textContent = `Mode: ${mode === "edit" ? "Owner" : "View"}`;
+
+  updatePinBadge();
 
   // Budget
   const total = house?.budget?.total ?? 0;
@@ -347,6 +367,20 @@ function init(){
 
 function refreshHouse(){
   house = HomagioDB.getHouse(houseId) || house;
+  updatePinBadge();
+}
+
+function hasPin(h){
+  const lat = Number(h?.lat);
+  const lng = Number(h?.lng);
+  return Number.isFinite(lat) && Number.isFinite(lng);
+}
+
+function updatePinBadge(){
+  const pinned = hasPin(house);
+  $pinBadge.style.display = "inline-flex";
+  $pinBadge.textContent = pinned ? "Pinned" : "Needs pin";
+  $pinBadge.classList.toggle("warn", !pinned);
 }
 
 function formatMoney(n){
@@ -362,7 +396,7 @@ function switchTab(e, tab){
   $tabBadge.textContent = tab === "interior" ? "Interior" : "Exterior";
 
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  const target = e?.target || document.querySelector(\`.tab[data-tab="\${tab}"]\`);
+  const target = e?.target || document.querySelector(`.tab[data-tab="${tab}"]`);
   if (target) target.classList.add("active");
 
   selectedPhotoId = null;
@@ -403,7 +437,6 @@ function renderPhotos(){
 function selectPhoto(photoId){
   selectedPhotoId = photoId;
   document.querySelectorAll(".photo").forEach(el => el.classList.remove("selected"));
-  // re-render to apply selected class cleanly
   renderPhotos();
 
   refreshHouse();
@@ -492,6 +525,81 @@ function closeModal(){
   $modal.innerHTML = "";
 }
 
+// ✅ NEW: Address / Pin modal (owner-only)
+function openAddressModal(){
+  refreshHouse();
+  const addr = (house?.address?.formatted || house?.address?.raw || "");
+  const lat = (house?.lat ?? "");
+  const lng = (house?.lng ?? "");
+
+  openModal(`
+    <div class="modalHead">
+      <b>Set Address / Pin</b>
+      <div class="closeX" onclick="closeModal()">✕</div>
+    </div>
+    <div class="form">
+      <div class="notice">
+        Add an address now. You can also paste lat/lng to pin it (we’ll add auto-geocoding later).
+      </div>
+
+      <div class="field">
+        <label>Address</label>
+        <input id="addrRaw" placeholder="123 Main St, Tulsa, OK 74133" value="${escapeAttr(addr)}" />
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Latitude (optional)</label>
+          <input id="addrLat" placeholder="36.15398" value="${escapeAttr(String(lat))}" />
+        </div>
+        <div class="field">
+          <label>Longitude (optional)</label>
+          <input id="addrLng" placeholder="-95.99277" value="${escapeAttr(String(lng))}" />
+        </div>
+      </div>
+
+      <div class="btn primary" onclick="saveAddressPin()">Save</div>
+    </div>
+  `);
+}
+
+function saveAddressPin(){
+  const raw = document.getElementById("addrRaw").value.trim();
+  const latStr = document.getElementById("addrLat").value.trim();
+  const lngStr = document.getElementById("addrLng").value.trim();
+
+  let lat = latStr === "" ? null : Number(latStr);
+  let lng = lngStr === "" ? null : Number(lngStr);
+
+  if (latStr !== "" && !Number.isFinite(lat)) { alert("Latitude must be a number."); return; }
+  if (lngStr !== "" && !Number.isFinite(lng)) { alert("Longitude must be a number."); return; }
+
+  // If one is provided, require both (to avoid half pins)
+  const oneProvided = (latStr !== "" && lngStr === "") || (latStr === "" && lngStr !== "");
+  if (oneProvided) { alert("Provide both latitude AND longitude, or leave both blank."); return; }
+
+  HomagioDB.upsertHouse({
+    ...house,
+    address: raw ? { raw, formatted: raw } : null,
+    lat,
+    lng,
+    updated: new Date().toISOString()
+  });
+
+  closeModal();
+  refreshHouse();
+
+  // Update header subline immediately
+  const styleBits = [];
+  if (house?.style) styleBits.push(house.style);
+  const addr = (house?.address?.formatted || house?.address?.raw || "").trim();
+  if (addr) styleBits.push(addr);
+  $houseStyle.textContent = styleBits.join(" • ");
+
+  updatePinBadge();
+}
+
+// Existing modals (photos/items)
 function openAddPhotoModal(){
   openModal(`
     <div class="modalHead">
@@ -534,7 +642,7 @@ async function savePhoto(){
   closeModal();
   activeTab = tab;
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.querySelector(\`.tab[data-tab="\${tab}"]\`)?.classList.add("active");
+  document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add("active");
   $tabBadge.textContent = tab === "interior" ? "Interior" : "Exterior";
   renderPhotos();
 }
@@ -577,7 +685,6 @@ function saveItem(){
   const saved = HomagioDB.addItem(houseId, it);
   closeModal();
 
-  // Nice UX: if a photo is selected, immediately offer to link
   if(selectedPhotoId){
     HomagioDB.linkItem(houseId, selectedPhotoId, saved.id);
     refreshHouse();
@@ -714,10 +821,9 @@ function savePhotoEdit(photoId){
   HomagioDB.updatePhoto(houseId, photoId, { tab, label });
   closeModal();
 
-  // If it moved tabs, update view
   activeTab = tab;
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.querySelector(\`.tab[data-tab="\${tab}"]\`)?.classList.add("active");
+  document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add("active");
   $tabBadge.textContent = tab === "interior" ? "Interior" : "Exterior";
 
   renderPhotos();
@@ -725,7 +831,6 @@ function savePhotoEdit(photoId){
 }
 
 function exportPDF(){
-  // MVP export: print. Later: jsPDF/html2canvas
   window.print();
 }
 
