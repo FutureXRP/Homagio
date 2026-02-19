@@ -1,34 +1,35 @@
-/* Homagio — Shared Styles (Zillow-like Light UI)
-   Goal: bright, clean, modern. White cards, subtle borders, strong readability.
+/* Homagio — Shared Styles (Premium Dark, logo-matched)
+   Palette pulled from your logo:
+   - Blue:  #34a5ff / #1174fe
+   - Green: #50af6d
+   - Gray:  #adb8b2
 */
 
 :root{
-  color-scheme: light;
+  color-scheme: dark;
 
-  --bg:#f5f7fb;
-  --bg2:#eef3fb;
+  --bg0:#06080d;
+  --bg1:#0a0f18;
 
-  --text:#0f172a;     /* slate-900 */
-  --muted:#475569;    /* slate-600 */
-  --muted2:#64748b;   /* slate-500 */
+  --text:#eaf0ff;
+  --muted:#b9c6de;
+  --muted2:#8fa1c6;
 
-  --card:#ffffff;
-  --card2:#ffffff;
+  --card: rgba(13, 18, 28, .72);
+  --card2: rgba(13, 18, 28, .60);
 
-  --border: rgba(15, 23, 42, .10);
-  --border2: rgba(15, 23, 42, .14);
+  --border: rgba(255,255,255,.10);
+  --border2: rgba(255,255,255,.16);
 
-  --shadow: 0 10px 28px rgba(2, 6, 23, .10);
-  --shadow2: 0 18px 60px rgba(2, 6, 23, .12);
+  --shadow: 0 18px 70px rgba(0,0,0,.55);
+  --shadow2: 0 26px 90px rgba(0,0,0,.62);
 
-  --blue:#2563eb;     /* blue-600 */
-  --blue2:#1d4ed8;    /* blue-700 */
-  --green:#16a34a;
-  --gold:#b45309;
-  --red:#dc2626;
+  --blue:#34a5ff;
+  --blue2:#1174fe;
+  --green:#50af6d;
 
-  --radius-xl: 20px;
-  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-lg: 18px;
   --radius-md: 14px;
   --radius-sm: 12px;
 
@@ -37,9 +38,10 @@
   --pad: 18px;
   --gap: 14px;
 
-  --ring: 0 0 0 4px rgba(37, 99, 235, .18);
+  --ring: 0 0 0 4px rgba(52,165,255,.28);
 }
 
+/* Base */
 *{box-sizing:border-box}
 html,body{height:100%}
 
@@ -48,15 +50,20 @@ body{
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
   color:var(--text);
   background:
-    radial-gradient(900px 560px at 15% 10%, rgba(37,99,235,.08), transparent 60%),
-    radial-gradient(800px 520px at 90% 25%, rgba(22,163,74,.06), transparent 55%),
-    linear-gradient(180deg, var(--bg), var(--bg2));
+    radial-gradient(1200px 720px at 15% 8%, rgba(17,116,254,.28), transparent 60%),
+    radial-gradient(980px 640px at 88% 22%, rgba(80,175,109,.20), transparent 58%),
+    linear-gradient(180deg, var(--bg0), var(--bg1));
   overflow-x:hidden;
 }
 
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
-hr{border:none;border-top:1px solid rgba(15,23,42,.10);margin:18px 0}
+hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:18px 0}
+
+/* Spacing helpers used in your pages */
+.sp10{height:10px}
+.sp14{height:14px}
+.sp18{height:18px}
 
 .wrap{
   width:min(var(--max), calc(100% - 40px));
@@ -78,24 +85,22 @@ hr{border:none;border-top:1px solid rgba(15,23,42,.10);margin:18px 0}
   align-items:center;
   padding:7px 12px;
   border-radius:999px;
-  background: rgba(37,99,235,.10);
-  border:1px solid rgba(37,99,235,.18);
-  color: rgba(29,78,216,1);
-  font-weight:700;
+  background: rgba(17,116,254,.18);
+  border:1px solid rgba(17,116,254,.30);
+  color: #cfe2ff;
+  font-weight:900;
   font-size:12px;
 }
 
-/* ---------------------------
-   Top Nav (Zillow-ish)
----------------------------- */
+/* Nav */
 .nav{
   position:sticky;
   top:0;
   z-index:50;
-  background: rgba(255,255,255,.78);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom:1px solid rgba(15,23,42,.10);
+  background: rgba(8, 11, 18, .72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.10);
 }
 .nav-inner{
   display:flex;
@@ -107,15 +112,14 @@ hr{border:none;border-top:1px solid rgba(15,23,42,.10);margin:18px 0}
 .brand{
   display:flex;
   align-items:center;
-  gap:10px;
-  font-weight:900;
+  gap:12px;
+  font-weight:950;
   letter-spacing:-.01em;
 }
-.logo-dot{
-  width:12px;height:12px;border-radius:999px;
-  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.9), transparent 45%),
-              linear-gradient(180deg, var(--blue), var(--blue2));
-  box-shadow: 0 0 0 6px rgba(37,99,235,.12);
+.brand img{
+  width:34px;height:34px;
+  border-radius:10px;
+  filter: drop-shadow(0 14px 28px rgba(0,0,0,.35));
 }
 .nav-links{
   display:flex;
@@ -131,23 +135,21 @@ hr{border:none;border-top:1px solid rgba(15,23,42,.10);margin:18px 0}
 }
 .nav a.link:hover{
   color:var(--text);
-  background: rgba(2,6,23,.04);
-  border-color: rgba(15,23,42,.10);
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.10);
 }
 .nav a.link.active{
-  color: var(--blue2);
-  background: rgba(37,99,235,.10);
-  border-color: rgba(37,99,235,.18);
+  color: #d9ecff;
+  background: rgba(17,116,254,.16);
+  border-color: rgba(17,116,254,.28);
   box-shadow: var(--ring);
 }
 
-/* ---------------------------
-   Buttons
----------------------------- */
+/* Buttons */
 .btn{
   appearance:none;
-  border:1px solid rgba(15,23,42,.14);
-  background: rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
   color:var(--text);
   padding:10px 12px;
   border-radius:14px;
@@ -156,57 +158,30 @@ hr{border:none;border-top:1px solid rgba(15,23,42,.10);margin:18px 0}
   justify-content:center;
   gap:10px;
   cursor:pointer;
-  font-weight:800;
+  font-weight:900;
   transition: transform .06s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease, filter .15s ease;
   user-select:none;
 }
 .btn:hover{
-  background: #fff;
-  border-color: rgba(15,23,42,.22);
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.18);
 }
 .btn:active{transform: translateY(1px)}
 .btn:focus{outline:none; box-shadow: var(--ring)}
 
 .btn.primary{
-  border-color: rgba(37,99,235,.26);
-  background: linear-gradient(180deg, rgba(37,99,235,.96), rgba(29,78,216,.96));
-  color:#fff;
-  box-shadow: 0 10px 26px rgba(37,99,235,.18);
+  border-color: rgba(17,116,254,.32);
+  background: linear-gradient(180deg, rgba(52,165,255,.98), rgba(17,116,254,.96));
+  color:#06101d;
+  box-shadow: 0 18px 40px rgba(17,116,254,.22);
 }
 .btn.primary:hover{filter:brightness(1.04)}
-.btn.good{
-  border-color: rgba(22,163,74,.26);
-  background: linear-gradient(180deg, rgba(22,163,74,.94), rgba(21,128,61,.94));
-  color:#fff;
-}
-.btn.danger{
-  border-color: rgba(220,38,38,.26);
-  background: linear-gradient(180deg, rgba(220,38,38,.94), rgba(185,28,28,.94));
-  color:#fff;
-}
-.btn.ghost{
-  background: transparent;
-  border-color: rgba(15,23,42,.12);
-}
-.btn.pill{border-radius:999px}
 .btn.sm{padding:8px 10px;border-radius:12px;font-size:13px}
 .btn.block{width:100%}
 .btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
 
-/* ---------------------------
-   Layout Blocks
----------------------------- */
+/* Cards / layout */
 .section{padding:34px 0}
-.hero{padding:42px 0 22px}
-.hero-grid{
-  display:grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap:24px;
-  align-items:start;
-}
-@media (max-width: 980px){
-  .hero-grid{grid-template-columns: 1fr; }
-}
 
 .card{
   background: var(--card);
@@ -216,8 +191,8 @@ hr{border:none;border-top:1px solid rgba(15,23,42,.10);margin:18px 0}
 }
 .card.pad{padding: var(--pad)}
 .card.soft{
-  background: rgba(255,255,255,.92);
-  border-color: rgba(15,23,42,.10);
+  background: rgba(13, 18, 28, .58);
+  border-color: rgba(255,255,255,.10);
 }
 
 .grid-2{
@@ -228,14 +203,6 @@ hr{border:none;border-top:1px solid rgba(15,23,42,.10);margin:18px 0}
 @media (max-width: 980px){
   .grid-2{grid-template-columns: 1fr;}
 }
-.grid-3{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--gap);
-}
-@media (max-width: 980px){
-  .grid-3{grid-template-columns: 1fr;}
-}
 
 .badge{
   display:inline-flex;
@@ -243,40 +210,38 @@ hr{border:none;border-top:1px solid rgba(15,23,42,.10);margin:18px 0}
   gap:8px;
   padding:6px 10px;
   border-radius:999px;
-  background: rgba(2,6,23,.03);
-  border:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
   color: var(--muted);
   font-size:12px;
-  font-weight:800;
+  font-weight:900;
 }
 .badge.blue{
-  background: rgba(37,99,235,.10);
-  border-color: rgba(37,99,235,.18);
-  color: var(--blue2);
+  background: rgba(17,116,254,.16);
+  border-color: rgba(17,116,254,.28);
+  color: #cfe2ff;
 }
 
-/* ---------------------------
-   Forms
----------------------------- */
+/* Forms */
 label{
   display:block;
   font-size:12px;
   color: var(--muted2);
   margin: 10px 0 6px;
-  font-weight:800;
+  font-weight:900;
 }
 .input, select, textarea{
   width:100%;
   padding:11px 12px;
   border-radius: 14px;
-  border:1px solid rgba(15,23,42,.14);
-  background: rgba(255,255,255,.96);
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
   color: var(--text);
   outline:none;
 }
 textarea{min-height: 92px; resize: vertical}
 .input:focus, select:focus, textarea:focus{
-  border-color: rgba(37,99,235,.32);
+  border-color: rgba(52,165,255,.38);
   box-shadow: var(--ring);
 }
 .row{
@@ -289,23 +254,17 @@ textarea{min-height: 92px; resize: vertical}
   .row{flex-direction:column; align-items:stretch}
 }
 
-/* ---------------------------
-   Lists / Cards
----------------------------- */
-.list{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
+/* Lists */
+.list{display:flex;flex-direction:column;gap:12px}
 .item-card{
   padding:14px;
   border-radius: var(--radius-lg);
-  border:1px solid rgba(15,23,42,.12);
-  background: rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(13,18,28,.58);
 }
 .item-card:hover{
-  border-color: rgba(15,23,42,.18);
-  background: #fff;
+  border-color: rgba(255,255,255,.16);
+  background: rgba(13,18,28,.66);
 }
 .item-top{
   display:flex;
@@ -313,12 +272,10 @@ textarea{min-height: 92px; resize: vertical}
   justify-content:space-between;
   gap:12px;
 }
-.item-title{font-weight:900;letter-spacing:-.01em}
+.item-title{font-weight:950;letter-spacing:-.01em}
 .item-sub{color: var(--muted2);font-size:12px;margin-top:4px}
 
-/* ---------------------------
-   Explore Map Layout Helpers
----------------------------- */
+/* Explore layout helpers */
 .split{
   display:grid;
   grid-template-columns: 1.25fr .75fr;
@@ -331,15 +288,15 @@ textarea{min-height: 92px; resize: vertical}
 .map-shell{
   border-radius: var(--radius-xl);
   overflow:hidden;
-  border:1px solid rgba(15,23,42,.12);
-  background: rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(13,18,28,.58);
   min-height: 560px;
   box-shadow: var(--shadow);
 }
 #map{
   width:100%;
   height: 560px;
-  background: rgba(2,6,23,.03);
+  background: rgba(0,0,0,.25);
 }
 @media (max-width: 980px){
   .map-shell{min-height: 420px}
@@ -347,8 +304,8 @@ textarea{min-height: 92px; resize: vertical}
 }
 .panel{
   border-radius: var(--radius-xl);
-  border:1px solid rgba(15,23,42,.12);
-  background: rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(13,18,28,.58);
   box-shadow: var(--shadow);
   overflow:hidden;
   display:flex;
@@ -357,7 +314,7 @@ textarea{min-height: 92px; resize: vertical}
 }
 .panel-h{
   padding: 14px 14px 12px;
-  border-bottom:1px solid rgba(15,23,42,.10);
+  border-bottom:1px solid rgba(255,255,255,.10);
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -367,23 +324,23 @@ textarea{min-height: 92px; resize: vertical}
   display:flex;
   gap:8px;
   padding: 8px;
-  background: rgba(2,6,23,.02);
-  border-bottom:1px solid rgba(15,23,42,.08);
+  background: rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
 .tab{
   flex:1;
   text-align:center;
   padding:10px 10px;
   border-radius: 14px;
-  font-weight:900;
+  font-weight:950;
   color: var(--muted);
   border:1px solid transparent;
   cursor:pointer;
 }
 .tab[data-on="1"]{
-  color: var(--blue2);
-  background: rgba(37,99,235,.10);
-  border-color: rgba(37,99,235,.18);
+  color: #d9ecff;
+  background: rgba(17,116,254,.16);
+  border-color: rgba(17,116,254,.28);
   box-shadow: var(--ring);
 }
 .panel-b{
@@ -392,9 +349,7 @@ textarea{min-height: 92px; resize: vertical}
   flex:1;
 }
 
-/* ---------------------------
-   Toasts
----------------------------- */
+/* Toasts */
 .toast-wrap{
   position: fixed;
   right: 16px;
@@ -407,10 +362,10 @@ textarea{min-height: 92px; resize: vertical}
 .toast{
   width: min(420px, calc(100vw - 32px));
   border-radius: 18px;
-  border: 1px solid rgba(15,23,42,.12);
-  background: rgba(255,255,255,.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(13,18,28,.70);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow2);
   padding: 12px 12px;
   display:flex;
@@ -420,36 +375,29 @@ textarea{min-height: 92px; resize: vertical}
 .toast .dot{
   width: 10px; height: 10px; border-radius: 999px; margin-top: 4px;
   background: linear-gradient(180deg, var(--blue), var(--blue2));
-  box-shadow: 0 0 0 6px rgba(37,99,235,.12);
+  box-shadow: 0 0 0 6px rgba(52,165,255,.16);
 }
-.toast.good .dot{background: linear-gradient(180deg, rgba(22,163,74,.94), rgba(21,128,61,.94)); box-shadow: 0 0 0 6px rgba(22,163,74,.10);}
-.toast.bad .dot{background: linear-gradient(180deg, rgba(220,38,38,.94), rgba(185,28,28,.94)); box-shadow: 0 0 0 6px rgba(220,38,38,.10);}
-.toast .t{font-weight: 900}
+.toast.good .dot{background: linear-gradient(180deg, rgba(80,175,109,.98), rgba(52,175,109,.92)); box-shadow: 0 0 0 6px rgba(80,175,109,.14);}
+.toast.bad .dot{background: linear-gradient(180deg, rgba(220,38,38,.94), rgba(185,28,28,.94)); box-shadow: 0 0 0 6px rgba(220,38,38,.14);}
+.toast .t{font-weight: 950}
 .toast .m{color: var(--muted); margin-top: 3px; font-size: 13px; line-height: 1.35}
 
-/* ---------------------------
-   Leaflet tweaks for light UI
----------------------------- */
-.leaflet-control-zoom a{
-  background: rgba(255,255,255,.92) !important;
-  color: var(--text) !important;
-  border: 1px solid rgba(15,23,42,.14) !important;
-  box-shadow: 0 10px 20px rgba(2,6,23,.10) !important;
-}
-.leaflet-control-zoom a:hover{
-  background: #fff !important;
-}
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip{
-  background: rgba(255,255,255,.96) !important;
-  color: var(--text) !important;
-  border: 1px solid rgba(15,23,42,.12) !important;
-  box-shadow: 0 14px 28px rgba(2,6,23,.14) !important;
-}
-.leaflet-container a{color: var(--blue2)}
-
-/* ---------------------------
-   Utility
----------------------------- */
 .hide{display:none !important}
 .center{display:grid;place-items:center}
+
+/* Leaflet tweaks (dark UI controls) */
+.leaflet-control-zoom a{
+  background: rgba(13,18,28,.72) !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 16px 28px rgba(0,0,0,.35) !important;
+}
+.leaflet-control-zoom a:hover{ background: rgba(13,18,28,.84) !important; }
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{
+  background: rgba(13,18,28,.86) !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 18px 38px rgba(0,0,0,.45) !important;
+}
+.leaflet-container a{color: var(--blue)}
