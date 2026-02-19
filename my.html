@@ -6,7 +6,9 @@
   <title>Homagio — My Houses</title>
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#07090d" />
-  <script src="assets/db.js"></script>
+
+  <!-- ✅ FIX: correct DB path for GitHub Pages -->
+  <script src="assets.db.js"></script>
 
   <style>
     :root{
@@ -154,6 +156,7 @@
           <label>House name</label>
           <input id="hn" placeholder="Blair Family Home" />
         </div>
+
         <div class="grid2">
           <div class="field">
             <label>Style</label>
@@ -165,15 +168,10 @@
           </div>
         </div>
 
-        <div class="grid2">
-          <div class="field">
-            <label>Latitude</label>
-            <input id="hlat" placeholder="36.15398" />
-          </div>
-          <div class="field">
-            <label>Longitude</label>
-            <input id="hlng" placeholder="-95.99277" />
-          </div>
+        <!-- ✅ NEW: Address instead of Lat/Lng -->
+        <div class="field">
+          <label>Address</label>
+          <input id="haddr" placeholder="123 Main St, Tulsa, OK 74133" />
         </div>
 
         <button class="btn primary" onclick="addHouse()">Create House</button>
@@ -188,7 +186,7 @@
 
   function render(){
     const list = document.getElementById("homesList");
-    const houses = HomagioDB.getAllHouses()
+    const houses = (HomagioDB.getAllHouses() || [])
       .sort((a,b)=> (b.updated||"").localeCompare(a.updated||""));
 
     if(!houses.length){
@@ -203,15 +201,22 @@
       const name = esc(h.name || "House");
       const style = esc(h.style || "");
       const tier = esc(h.tier || "");
+      const addr = esc((h.address?.formatted || h.address?.raw || "").trim());
+      const hasPin = Number.isFinite(Number(h.lat)) && Number.isFinite(Number(h.lng));
+
       return `
         <div class="row">
           <div style="min-width:0">
             <b title="${name}">${name}</b>
-            <small>${style} • ${tier} • Updated ${updated}</small>
+            <small>
+              ${style} • ${tier} • Updated ${updated}
+              ${addr ? ` • ${addr}` : ``}
+              ${hasPin ? `` : ` • <span style="color:rgba(255,220,120,.95);font-weight:900">Needs pin</span>`}
+            </small>
           </div>
           <div class="right">
-            <a class="btn" href="house.html?id=${encodeURIComponent(h.id)}&mode=view">View</a>
-            <a class="btn primary" href="house.html?id=${encodeURIComponent(h.id)}&mode=edit">Edit</a>
+            <a class="btn" href="house.html?id=${encodeURIComponent(h.id)}&mode=view&from=my">View</a>
+            <a class="btn primary" href="house.html?id=${encodeURIComponent(h.id)}&mode=edit&from=my">Edit</a>
           </div>
         </div>
       `;
@@ -219,9 +224,9 @@
   }
 
   function openFirstOrCreate(){
-    const houses = HomagioDB.getAllHouses();
+    const houses = HomagioDB.getAllHouses() || [];
     if(houses.length){
-      window.location.href = `house.html?id=${encodeURIComponent(houses[0].id)}&mode=edit`;
+      window.location.href = `house.html?id=${encodeURIComponent(houses[0].id)}&mode=edit&from=my`;
     } else {
       alert("Create a house first (or tap Reset Demo).");
     }
@@ -231,16 +236,19 @@
     const name = document.getElementById("hn").value.trim() || "New House";
     const style = document.getElementById("hs").value.trim() || "Modern";
     const tier = document.getElementById("ht").value.trim() || "Free";
-
-    const lat = parseFloat(document.getElementById("hlat").value.trim() || "36.15398");
-    const lng = parseFloat(document.getElementById("hlng").value.trim() || "-95.99277");
+    const rawAddr = document.getElementById("haddr").value.trim();
 
     const id = HomagioDB.uid("house");
+
+    // NOTE: We intentionally do NOT geocode yet (no API keys needed for MVP).
+    // Explore will show it as "Needs pin" until we add a geocoding step.
     const house = {
       id,
       ownerId: "local-owner",
       name, style, tier,
-      lat, lng,
+      address: rawAddr ? { raw: rawAddr, formatted: rawAddr } : null,
+      lat: null,
+      lng: null,
       updated: new Date().toISOString(),
       budget: { total: 0, spent: 0 },
       items: {},
@@ -253,11 +261,12 @@
     document.getElementById("hn").value = "";
     document.getElementById("hs").value = "";
     document.getElementById("ht").value = "";
-    document.getElementById("hlat").value = "";
-    document.getElementById("hlng").value = "";
+    document.getElementById("haddr").value = "";
 
     render();
-    window.location.href = `house.html?id=${encodeURIComponent(id)}&mode=edit`;
+
+    // Open in edit mode (owner), return should go back to My Houses
+    window.location.href = `house.html?id=${encodeURIComponent(id)}&mode=edit&from=my`;
   }
 
   function resetDemo(){
