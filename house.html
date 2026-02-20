@@ -4,499 +4,586 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Homagio — House</title>
-  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Track materials, links, and photos for your home." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#07090d" />
+
   <style>
     :root{
+      color-scheme: dark;
+
       --bg0:#07090d;
       --bg1:#0b0f16;
-      --muted:#a9b4c7;
-      --text:#eaf0ff;
-      --line:rgba(255,255,255,.10);
-      --blue:#2d6cdf;
-      --blue2:#1f4fb0;
-      --good:#27c7a8;
-      --warn:#ffcc66;
-      --bad:#ff5577;
-      --r:18px;
+      --card0: rgba(255,255,255,.06);
+      --card1: rgba(255,255,255,.09);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.16);
+
+      --text0: rgba(255,255,255,.92);
+      --text1: rgba(255,255,255,.70);
+      --text2: rgba(255,255,255,.55);
+
+      --brand:#2d6cdf;
+      --brand2:#1f4fb0;
+
+      --radius:18px;
+      --radius2:26px;
+
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 10px 30px rgba(0,0,0,.45);
+
+      --max: 1180px;
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 600px at 25% -10%, rgba(45,108,223,.22), transparent 60%),
-                  radial-gradient(900px 500px at 90% 0%, rgba(39,199,168,.16), transparent 60%),
-                  linear-gradient(180deg, var(--bg0), var(--bg1));
-      color:var(--text);
-      min-height:100vh;
+      background:
+        radial-gradient(900px 500px at 20% -10%, rgba(45,108,223,.22), transparent 60%),
+        radial-gradient(900px 500px at 80% -10%, rgba(120,70,255,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color: var(--text0);
     }
-    a{color:inherit;text-decoration:none}
-    .top{
-      position:sticky; top:0; z-index:30;
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width: var(--max); margin:0 auto; padding: 20px 18px 28px; }
+
+    /* ---------- App Shell Header ---------- */
+    .app-header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
       backdrop-filter: blur(10px);
       background: rgba(7,9,13,.72);
-      border-bottom:1px solid var(--line);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .wrap{max-width:1100px;margin:0 auto;padding:14px 16px}
-    .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .brand{display:flex;gap:10px;align-items:center}
+    .app-header .wrap{ padding: 14px 18px; }
+    .bar{ display:flex; align-items:center; gap:14px; justify-content:space-between; }
+    .brand{ display:flex; align-items:center; gap:10px; min-width:170px; }
     .logo{
-      width:34px;height:34px;border-radius:12px;
-      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.20), transparent 45%),
-                  linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
-      box-shadow: 0 0 0 6px rgba(45,108,223,.18), 0 18px 40px rgba(0,0,0,.45);
+      width: 38px; height: 38px; border-radius: 14px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25), transparent 40%),
+        linear-gradient(180deg, rgba(45,108,223,0.98), rgba(31,79,176,0.98));
+      box-shadow: 0 0 0 6px rgba(45,108,223,.22), 0 14px 34px rgba(0,0,0,.40);
+      display:grid; place-items:center;
+      border: 1px solid rgba(255,255,255,.12);
     }
-    .brand h1{font-size:14px;margin:0;letter-spacing:.3px}
-    .brand p{margin:0;font-size:12px;color:var(--muted)}
-    .nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .btn{
-      border:1px solid var(--line);
+    .brand h1{ font-size:14px; margin:0; letter-spacing:.3px; line-height:1.1; }
+    .brand span{ display:block; font-size:12px; color:var(--text2); margin-top:2px; }
+
+    .nav{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; }
+    .nav a{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      color: var(--text1);
+      font-size: 13px;
+    }
+    .nav a:hover{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.08); color: var(--text0); }
+    .nav a.active{ background: rgba(45,108,223,.14); border-color: rgba(45,108,223,.28); color: rgba(255,255,255,.92); }
+
+    .right{ display:flex; align-items:center; gap:10px; min-width:170px; justify-content:flex-end; }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 10px 12px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius: 14px;
-      font-size:13px;
-      cursor:pointer;
-      transition:.15s transform,.15s background,.15s border;
+      color: var(--text1);
+      font-size: 13px;
+      box-shadow: var(--shadow2);
+      white-space:nowrap;
     }
-    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.16)}
+    .dot{ width:8px; height:8px; border-radius:99px; background: rgba(255,255,255,.35); box-shadow: 0 0 0 4px rgba(255,255,255,.08); }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 12px 14px; border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.90);
+      font-weight: 600; font-size:13px;
+      cursor:pointer; user-select:none;
+      box-shadow: var(--shadow2);
+      white-space:nowrap;
+    }
+    .btn:hover{ background: rgba(255,255,255,.09); }
     .btn.primary{
-      border:none;
-      background: linear-gradient(180deg, rgba(45,108,223,.95), rgba(31,79,176,.95));
-      box-shadow: 0 12px 30px rgba(45,108,223,.28);
+      border-color: rgba(45,108,223,.35);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.16), transparent 46%),
+        linear-gradient(180deg, rgba(45,108,223,.96), rgba(31,79,176,.96));
+    }
+    .btn.primary:hover{ filter: brightness(1.05); }
+
+    @media (max-width: 960px){
+      .right{ display:none; }
+      .brand{ min-width:auto; }
     }
 
+    /* ---------- Page ---------- */
+    .page-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 18px 0 12px;
+    }
+    .page-head h2{ margin:0; font-size:22px; letter-spacing:.2px; }
+    .page-head p{ margin:6px 0 0; color: var(--text2); font-size:13px; }
+
     .grid{
-      max-width:1100px;
-      margin:0 auto;
-      padding:18px 16px 50px;
       display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap:14px;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 16px;
+      align-items:start;
     }
     @media (max-width: 980px){
-      .grid{grid-template-columns:1fr}
+      .grid{ grid-template-columns: 1fr; }
     }
 
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid var(--line);
-      border-radius: var(--r);
-      box-shadow: 0 18px 55px rgba(0,0,0,.35);
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .hd{padding:14px 14px 10px;border-bottom:1px solid var(--line)}
-    .t{font-weight:800;font-size:14px;margin:0}
-    .s{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.35}
-    .bd{padding:14px}
+    .card .hd{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .card .hd h3{ margin:0; font-size:14px; letter-spacing:.25px; }
+    .card .bd{ padding: 14px; }
 
-    .seg{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .chip{
-      padding:8px 10px;
-      border-radius: 999px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      font-size:12px;
-      color: var(--muted);
-      cursor:pointer;
-    }
-    .chip.active{
-      color: var(--text);
-      border-color: rgba(45,108,223,.55);
-      background: rgba(45,108,223,.18);
-    }
-
-    .photos{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-    }
-    @media (max-width: 700px){
-      .photos{grid-template-columns: repeat(2, 1fr)}
-    }
-    .ph{
-      border:1px solid var(--line);
-      border-radius: 16px;
-      overflow:hidden;
-      background: rgba(0,0,0,.16);
-      cursor:pointer;
-    }
-    .ph img{
-      width:100%;
-      height:120px;
-      object-fit:cover;
+    label{
       display:block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
     }
-    .ph .cap{padding:8px 10px;font-size:12px;color:var(--muted);line-height:1.25}
-    .ph.active{border-color: rgba(45,108,223,.65); box-shadow: 0 0 0 4px rgba(45,108,223,.12)}
-
-    .item{
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      border-radius: 16px;
-      padding:12px;
-      margin-bottom:10px;
-    }
-    .item .name{font-weight:800}
-    .item .meta{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
-    .item a{color: rgba(234,240,255,.95); text-decoration: underline; word-break: break-word}
-
-    .kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
-    .kpi{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      padding:10px;
-      border-radius: 16px;
-    }
-    .kpi .l{font-size:11px;color:var(--muted)}
-    .kpi .v{font-size:14px;font-weight:900;margin-top:6px}
-    label{font-size:12px;color:var(--muted)}
     input, select, textarea{
-      width:100%;
-      padding:12px 12px;
+      width: 100%;
+      padding: 12px 12px;
       border-radius: 14px;
-      border:1px solid var(--line);
+      border: 1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.22);
-      color: var(--text);
+      color: var(--text0);
       outline:none;
     }
-    textarea{min-height:80px; resize:vertical}
-    input:focus, select:focus, textarea:focus{border-color: rgba(45,108,223,.65); box-shadow: 0 0 0 4px rgba(45,108,223,.15)}
-    .row2{display:flex;gap:10px}
-    .row2 > *{flex:1}
-    .small{font-size:12px;color:var(--muted);line-height:1.35}
-    .hr{height:1px;background:var(--line);margin:12px 0}
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(45,108,223,.55);
+      box-shadow: 0 0 0 4px rgba(45,108,223,.18);
+    }
+
+    .form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .full{ grid-column: 1 / -1; }
+
+    .actions{ display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap; margin-top: 12px; }
+
+    .list{ display:flex; flex-direction:column; gap: 10px; }
+    .item{
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+    }
+    .item:hover{ background: rgba(255,255,255,.07); }
+    .item .t{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .item h4{ margin:0; font-size:14px; letter-spacing:.2px; }
+    .meta{ margin-top:4px; color:var(--text2); font-size:12px; line-height:1.35; }
+    .chiprow{ display:flex; gap:8px; flex-wrap:wrap; margin-top: 8px; }
+    .chip{
+      font-size: 12px;
+      color: var(--text1);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+    }
+
+    .thumbs{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 980px){
+      .thumbs{ grid-template-columns: repeat(2, 1fr); }
+    }
+    .thumb{
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      min-height: 110px;
+      display:flex;
+      flex-direction:column;
+    }
+    .thumb img{
+      width:100%;
+      height: 120px;
+      object-fit: cover;
+      display:block;
+    }
+    .thumb .cap{
+      padding: 10px;
+      font-size: 12px;
+      color: var(--text1);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 8px;
+    }
+
+    .muted{ color: var(--text2); font-size: 13px; }
+    .danger{ border-color: rgba(255,80,80,.28) !important; background: rgba(255,80,80,.10) !important; }
   </style>
 </head>
+
 <body>
-  <div class="top">
+  <!-- App Shell Header -->
+  <header class="app-header">
     <div class="wrap">
-      <div class="row">
-        <div class="brand">
-          <div class="logo"></div>
-          <div>
-            <h1 id="houseTitle">House</h1>
-            <p id="houseSub">Mode: View</p>
+      <div class="bar">
+        <a class="brand" href="index.html" aria-label="Homagio Home">
+          <div class="logo" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3l9 7v10a2 2 0 0 1-2 2h-5v-7H10v7H5a2 2 0 0 1-2-2V10l9-7z" stroke="rgba(255,255,255,.92)" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
           </div>
-        </div>
+          <div>
+            <h1>Homagio</h1>
+            <span id="brandSub">House</span>
+          </div>
+        </a>
 
-        <div class="nav">
-          <a class="btn" href="./my.html">← Back</a>
-          <a class="btn" href="./explore.html">Explore</a>
-          <button class="btn primary" id="btnEditToggle">Edit: off</button>
+        <nav class="nav" aria-label="Primary">
+          <a href="explore.html">Explore</a>
+          <a href="my.html">My Houses</a>
+          <a class="active" href="#" id="houseNav">House</a>
+        </nav>
+
+        <div class="right">
+          <div class="pill" title="Auth coming next">
+            <span class="dot"></span>
+            Guest Mode
+          </div>
+          <a class="btn" href="my.html">Back to list</a>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <div class="grid">
-    <div class="card">
-      <div class="hd">
-        <div class="t">Photos</div>
-        <div class="s">Select a photo to view linked materials & purchase links.</div>
-        <div class="seg">
-          <div class="chip active" id="chipInterior">Interior</div>
-          <div class="chip" id="chipExterior">Exterior</div>
-        </div>
+  <main class="wrap">
+    <div class="page-head">
+      <div>
+        <h2 id="title">House</h2>
+        <p id="subtitle">Track photos, materials, and purchase links.</p>
       </div>
-      <div class="bd">
-        <div id="photos" class="photos"></div>
-        <div id="noPhotos" class="small" style="display:none;margin-top:10px">No photos yet.</div>
-
-        <div class="hr"></div>
-
-        <div class="t" style="font-size:13px">Linked items</div>
-        <div class="small" style="margin-top:6px">Tap a photo above to see its linked materials and items.</div>
-        <div style="height:12px"></div>
-        <div id="items"></div>
-        <div id="noItems" class="small" style="display:none">Select a photo to view its linked materials and items.</div>
+      <div class="actions" style="margin:0;">
+        <button class="btn" id="exportBtn" type="button">Export PDF (stub)</button>
+        <a class="btn primary" id="openExplore" href="explore.html">Open Explore</a>
       </div>
     </div>
 
-    <div class="card">
-      <div class="hd">
-        <div class="t">Budget</div>
-        <div class="s">Track total vs spent (local MVP).</div>
-      </div>
-      <div class="bd">
-        <div class="kpis" id="kpis"></div>
-
-        <div class="hr"></div>
-
-        <div class="t" style="font-size:13px">Add Photo</div>
-        <div class="small" style="margin-top:6px">Paste an image URL (MVP). Later we’ll support uploads.</div>
-        <div style="height:10px"></div>
-
-        <label>Section</label>
-        <select id="photoSection">
-          <option value="interior">Interior</option>
-          <option value="exterior">Exterior</option>
-        </select>
-        <div style="height:10px"></div>
-
-        <label>Image URL</label>
-        <input id="photoUrl" placeholder="https://…" />
-        <div style="height:10px"></div>
-
-        <label>Caption</label>
-        <input id="photoCaption" placeholder="e.g., Kitchen backsplash" />
-        <div style="height:10px"></div>
-
-        <button class="btn primary" id="addPhotoBtn">Add Photo</button>
-
-        <div class="hr"></div>
-
-        <div class="t" style="font-size:13px">Add Item / Material</div>
-        <div class="small" style="margin-top:6px">Links can be tied to a selected photo, or stored unlinked.</div>
-        <div style="height:10px"></div>
-
-        <label>Title</label>
-        <input id="itTitle" placeholder="e.g., Paint — Simply White" />
-        <div style="height:10px"></div>
-
-        <div class="row2">
-          <div>
-            <label>Category</label>
-            <input id="itCategory" placeholder="Paint / Flooring / Fixture" />
-          </div>
-          <div>
-            <label>Price</label>
-            <input id="itPrice" type="number" min="0" step="0.01" placeholder="62" />
-          </div>
+    <section class="grid">
+      <!-- Left: Materials / Links -->
+      <div class="card">
+        <div class="hd">
+          <h3>Materials & links</h3>
+          <div class="muted" id="itemsCount">0</div>
         </div>
-        <div style="height:10px"></div>
+        <div class="bd">
+          <form id="itemForm">
+            <div class="form">
+              <div class="full">
+                <label>Item name</label>
+                <input id="itemName" placeholder="e.g., Kitchen faucet — matte black" required />
+              </div>
+              <div>
+                <label>Category</label>
+                <input id="itemCat" placeholder="Faucet, Tile, Paint…" />
+              </div>
+              <div>
+                <label>Price (optional)</label>
+                <input id="itemPrice" type="number" min="0" step="0.01" placeholder="199.99" />
+              </div>
+              <div class="full">
+                <label>Purchase link (optional)</label>
+                <input id="itemLink" placeholder="https://…" />
+              </div>
+              <div class="full">
+                <label>Notes (optional)</label>
+                <textarea id="itemNotes" rows="2" placeholder="Finish, SKU, where used…"></textarea>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn primary" type="submit">Add item</button>
+            </div>
+          </form>
 
-        <div class="row2">
-          <div>
-            <label>Brand</label>
-            <input id="itBrand" placeholder="Brand" />
+          <div style="height:12px;"></div>
+          <div class="list" id="itemsList"></div>
+          <div class="muted" id="itemsEmpty" style="display:none;">
+            No items yet — add your first material above.
           </div>
-          <div>
-            <label>Finish</label>
-            <input id="itFinish" placeholder="Matte / Satin / Eggshell" />
-          </div>
-        </div>
-        <div style="height:10px"></div>
-
-        <label>Purchase link</label>
-        <input id="itLink" placeholder="https://…" />
-        <div style="height:10px"></div>
-
-        <label>Notes</label>
-        <textarea id="itNotes" placeholder="Any notes…"></textarea>
-        <div style="height:10px"></div>
-
-        <button class="btn primary" id="addItemBtn">+ Link item</button>
-
-        <div class="hr"></div>
-
-        <button class="btn" id="exportBtn">Export PDF (stub)</button>
-        <div class="small" style="margin-top:8px">
-          PDF export is a placeholder in the static site. We can wire a real export next (html2pdf / jsPDF).
         </div>
       </div>
-    </div>
-  </div>
 
-  <script src="./assets/db.js"></script>
+      <!-- Right: Photos -->
+      <div class="card">
+        <div class="hd">
+          <h3>Photos</h3>
+          <div class="muted" id="photosCount">0</div>
+        </div>
+        <div class="bd">
+          <form id="photoForm">
+            <div class="form">
+              <div class="full">
+                <label>Photo URL (temporary MVP)</label>
+                <input id="photoUrl" placeholder="Paste an image URL…" required />
+              </div>
+              <div class="full">
+                <label>Caption (optional)</label>
+                <input id="photoCap" placeholder="e.g., Living room — new floors" />
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn primary" type="submit">Add photo</button>
+            </div>
+            <div class="muted" style="margin-top:10px;">
+              Next backend step: Storage upload instead of URL paste.
+            </div>
+          </form>
+
+          <div style="height:12px;"></div>
+          <div class="thumbs" id="photosGrid"></div>
+          <div class="muted" id="photosEmpty" style="display:none;">
+            No photos yet — add one above.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/db.js"></script>
   <script>
-    const $ = (id) => document.getElementById(id);
-
+    // House page controller. Works with MVP DB functions if available.
     const params = new URLSearchParams(location.search);
-    const houseId = params.get("id");
+    const homeId = params.get('id');
 
-    let modeEdit = false;
-    let filterSection = "interior"; // interior | exterior
-    let selectedPhotoId = null;
+    const titleEl = document.getElementById('title');
+    const brandSub = document.getElementById('brandSub');
+    const subtitleEl = document.getElementById('subtitle');
 
-    function escapeHtml(str){
-      return String(str || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-    function escapeAttr(str){
-      return String(str || "").replaceAll('"',"&quot;");
-    }
-    function money(n){
-      const v = Number(n || 0);
-      return "$" + v.toLocaleString(undefined, { maximumFractionDigits: 0 });
-    }
+    const itemsCount = document.getElementById('itemsCount');
+    const itemsList = document.getElementById('itemsList');
+    const itemsEmpty = document.getElementById('itemsEmpty');
 
-    function loadHouse(){
-      const h = HomagioDB.getHouse(houseId);
-      if(!h){
-        $("houseTitle").textContent = "House not found";
-        $("houseSub").textContent = "Go back and create a house first.";
-        return null;
-      }
-      $("houseTitle").textContent = h.name || "House";
-      $("houseSub").textContent = (modeEdit ? "Mode: Edit" : "Mode: View") + (h.address ? " • " + h.address : "");
-      return h;
+    const photosCount = document.getElementById('photosCount');
+    const photosGrid = document.getElementById('photosGrid');
+    const photosEmpty = document.getElementById('photosEmpty');
+
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
     }
 
-    function renderBudget(h){
-      const total = Number(h.budgetTotal || 0);
-      const spent = Number(h.budgetSpent || 0);
-      const remaining = total - spent;
-      $("kpis").innerHTML = `
-        <div class="kpi"><div class="l">Total</div><div class="v">${money(total)}</div></div>
-        <div class="kpi"><div class="l">Spent</div><div class="v">${money(spent)}</div></div>
-        <div class="kpi"><div class="l">Remaining</div><div class="v">${money(remaining)}</div></div>
-      `;
+    function getHome(){
+      try{
+        if(HomagioDB.getHomeById) return HomagioDB.getHomeById(homeId);
+        if(HomagioDB.getHomes){
+          const homes = HomagioDB.getHomes() || [];
+          return homes.find(h => h.id === homeId);
+        }
+      }catch(e){}
+      return null;
     }
 
-    function renderPhotos(h){
-      const list = (h.photos || []).filter(p => (p.section || "interior") === filterSection);
-      const wrap = $("photos");
-      wrap.innerHTML = "";
-
-      $("noPhotos").style.display = list.length ? "none" : "block";
-
-      list.forEach((p)=>{
-        const div = document.createElement("div");
-        div.className = "ph" + (p.id === selectedPhotoId ? " active" : "");
-        div.innerHTML = `
-          <img src="${escapeAttr(p.url)}" alt="" />
-          <div class="cap">${escapeHtml(p.caption || "Photo")}</div>
-        `;
-        div.addEventListener("click", ()=>{
-          selectedPhotoId = p.id;
-          renderPhotos(loadHouse());
-          renderItems(loadHouse());
-        });
-        wrap.appendChild(div);
-      });
-
-      // Auto-select first if none
-      if(!selectedPhotoId && list[0]){
-        selectedPhotoId = list[0].id;
-        renderItems(h);
-        renderPhotos(h);
-      }
+    function getItems(){
+      try{
+        if(HomagioDB.getItemsForHome) return HomagioDB.getItemsForHome(homeId) || [];
+        // fallback: DB might store items on home
+        const h = getHome();
+        return (h && h.items) ? h.items : [];
+      }catch(e){}
+      return [];
     }
 
-    function renderItems(h){
-      const itemsWrap = $("items");
-      itemsWrap.innerHTML = "";
+    function getPhotos(){
+      try{
+        if(HomagioDB.getPhotosForHome) return HomagioDB.getPhotosForHome(homeId) || [];
+        const h = getHome();
+        return (h && h.photos) ? h.photos : [];
+      }catch(e){}
+      return [];
+    }
 
-      const items = Array.isArray(h.items) ? h.items : [];
-      const linked = selectedPhotoId ? items.filter(it => it.photoId === selectedPhotoId) : [];
-
-      $("noItems").style.display = linked.length ? "none" : "block";
-      $("noItems").textContent = selectedPhotoId ? "No linked items for this photo yet." : "Select a photo to view its linked materials and items.";
-
-      linked.forEach((it)=>{
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-          <div class="name">${escapeHtml(it.title || "Item")}</div>
-          <div class="meta">
-            ${escapeHtml([it.category,it.brand,it.finish].filter(Boolean).join(" • "))}${(it.category||it.brand||it.finish) ? "<br/>" : ""}
-            ${it.link ? `<a href="${escapeAttr(it.link)}" target="_blank" rel="noopener">${escapeHtml(it.link)}</a><br/>` : ""}
-            ${it.price ? `Price: $${Number(it.price).toLocaleString(undefined,{maximumFractionDigits:2})}<br/>` : ""}
-            ${it.notes ? escapeHtml(it.notes) : ""}
+    function render(){
+      const h = getHome();
+      if(!homeId || !h){
+        titleEl.textContent = 'House not found';
+        brandSub.textContent = 'House';
+        subtitleEl.textContent = 'Go to My Houses and open a home.';
+        document.querySelector('main').innerHTML = `
+          <div class="wrap">
+            <div class="card">
+              <div class="hd"><h3>Missing house</h3><div class="muted">No ID or not found</div></div>
+              <div class="bd">
+                <div class="muted">Open <a class="btn primary" style="margin-left:10px;" href="my.html">My Houses</a> to create or select a home.</div>
+              </div>
+            </div>
           </div>
         `;
-        itemsWrap.appendChild(div);
-      });
-    }
-
-    function setSection(section){
-      filterSection = section;
-      selectedPhotoId = null;
-      $("chipInterior").classList.toggle("active", section === "interior");
-      $("chipExterior").classList.toggle("active", section === "exterior");
-      renderPhotos(loadHouse());
-      renderItems(loadHouse());
-    }
-
-    $("chipInterior").addEventListener("click", ()=>setSection("interior"));
-    $("chipExterior").addEventListener("click", ()=>setSection("exterior"));
-
-    $("btnEditToggle").addEventListener("click", ()=>{
-      modeEdit = !modeEdit;
-      $("btnEditToggle").textContent = modeEdit ? "Edit: on" : "Edit: off";
-      loadHouse();
-    });
-
-    $("addPhotoBtn").addEventListener("click", ()=>{
-      const h = loadHouse();
-      if(!h) return;
-
-      const section = $("photoSection").value;
-      const url = $("photoUrl").value.trim();
-      const caption = $("photoCaption").value.trim();
-
-      if(!url){
-        alert("Paste an image URL first.");
         return;
       }
 
-      HomagioDB.addPhoto(h.id, { section, url, caption });
-      $("photoUrl").value = "";
-      $("photoCaption").value = "";
-      setSection(section);
-    });
+      titleEl.textContent = h.name || 'House';
+      brandSub.textContent = h.name || 'House';
+      subtitleEl.textContent = h.address || '—';
 
-    $("addItemBtn").addEventListener("click", ()=>{
-      const h = loadHouse();
-      if(!h) return;
+      // Items
+      const items = getItems();
+      itemsCount.textContent = String(items.length);
+      itemsList.innerHTML = '';
+      if(!items.length){
+        itemsEmpty.style.display = 'block';
+      }else{
+        itemsEmpty.style.display = 'none';
+        for(const it of items){
+          const name = escapeHtml(it.name || it.title || 'Item');
+          const cat = escapeHtml(it.category || '');
+          const notes = escapeHtml(it.notes || '');
+          const price = (it.price != null && it.price !== '') ? `$${Number(it.price).toLocaleString(undefined,{maximumFractionDigits:2})}` : '';
+          const link = it.link ? String(it.link) : '';
 
-      const title = $("itTitle").value.trim();
-      const category = $("itCategory").value.trim();
-      const price = Number($("itPrice").value || 0);
-      const brand = $("itBrand").value.trim();
-      const finish = $("itFinish").value.trim();
-      const link = $("itLink").value.trim();
-      const notes = $("itNotes").value.trim();
-
-      if(!title){
-        alert("Add a title for the item.");
-        return;
+          const el = document.createElement('div');
+          el.className = 'item';
+          el.innerHTML = `
+            <div class="t">
+              <h4>${name}</h4>
+              <span class="muted">${price || ''}</span>
+            </div>
+            <div class="meta">
+              ${cat ? `<div>${cat}</div>` : ''}
+              ${notes ? `<div>${notes}</div>` : ''}
+              ${link ? `<div style="margin-top:6px;"><a class="chip" href="${escapeHtml(link)}" target="_blank" rel="noopener">Open link ↗</a></div>` : ''}
+            </div>
+          `;
+          itemsList.appendChild(el);
+        }
       }
 
-      HomagioDB.addItem(h.id, {
-        photoId: selectedPhotoId || null,
-        title,
-        category,
-        price,
-        brand,
-        finish,
-        link,
-        notes
-      });
-
-      $("itTitle").value = "";
-      $("itCategory").value = "";
-      $("itPrice").value = "";
-      $("itBrand").value = "";
-      $("itFinish").value = "";
-      $("itLink").value = "";
-      $("itNotes").value = "";
-
-      renderItems(loadHouse());
-    });
-
-    $("exportBtn").addEventListener("click", ()=>{
-      alert("PDF export is a stub in the static site. Next step: wire html2pdf/jsPDF with a clean template.");
-    });
-
-    // Init
-    HomagioDB.ensure();
-
-    if(!houseId){
-      $("houseTitle").textContent = "Missing house id";
-      $("houseSub").textContent = "Open from My Houses.";
-    } else {
-      const h = loadHouse();
-      if(h){
-        renderBudget(h);
-        renderPhotos(h);
-        renderItems(h);
+      // Photos
+      const photos = getPhotos();
+      photosCount.textContent = String(photos.length);
+      photosGrid.innerHTML = '';
+      if(!photos.length){
+        photosEmpty.style.display = 'block';
+      }else{
+        photosEmpty.style.display = 'none';
+        for(const p of photos){
+          const url = String(p.url || p.src || '');
+          const cap = escapeHtml(p.caption || p.cap || '');
+          const el = document.createElement('div');
+          el.className = 'thumb';
+          el.innerHTML = `
+            <img src="${escapeHtml(url)}" alt="${cap || 'Photo'}" loading="lazy" />
+            <div class="cap">
+              <span>${cap || 'Photo'}</span>
+              <span class="muted">✓</span>
+            </div>
+          `;
+          photosGrid.appendChild(el);
+        }
       }
     }
+
+    // Add item
+    document.getElementById('itemForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if(!homeId) return;
+
+      const item = {
+        name: document.getElementById('itemName').value.trim(),
+        category: document.getElementById('itemCat').value.trim(),
+        price: document.getElementById('itemPrice').value.trim(),
+        link: document.getElementById('itemLink').value.trim(),
+        notes: document.getElementById('itemNotes').value.trim(),
+        createdAt: Date.now()
+      };
+
+      try{
+        if(HomagioDB.addItemToHome){
+          HomagioDB.addItemToHome(homeId, item);
+        }else if(HomagioDB.addItem){
+          HomagioDB.addItem(homeId, item);
+        }else{
+          // fallback: attach to home and write if DB exposes update
+          const h = getHome();
+          h.items = h.items || [];
+          h.items.push(item);
+          if(HomagioDB.updateHome) HomagioDB.updateHome(homeId, h);
+        }
+      }catch(err){
+        console.error(err);
+        alert('Could not add item. Check console.');
+      }
+
+      e.target.reset();
+      render();
+    });
+
+    // Add photo
+    document.getElementById('photoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if(!homeId) return;
+
+      const photo = {
+        url: document.getElementById('photoUrl').value.trim(),
+        caption: document.getElementById('photoCap').value.trim(),
+        createdAt: Date.now()
+      };
+
+      try{
+        if(HomagioDB.addPhotoToHome){
+          HomagioDB.addPhotoToHome(homeId, photo);
+        }else if(HomagioDB.addPhoto){
+          HomagioDB.addPhoto(homeId, photo);
+        }else{
+          const h = getHome();
+          h.photos = h.photos || [];
+          h.photos.push(photo);
+          if(HomagioDB.updateHome) HomagioDB.updateHome(homeId, h);
+        }
+      }catch(err){
+        console.error(err);
+        alert('Could not add photo. Check console.');
+      }
+
+      e.target.reset();
+      render();
+    });
+
+    // Export (stub)
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      alert('PDF export is stubbed right now. Next step: client-side export (jsPDF/html2pdf) or server-side (Firebase Function).');
+    });
+
+    render();
   </script>
 </body>
 </html>
