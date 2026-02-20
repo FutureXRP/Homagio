@@ -4,537 +4,583 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Homagio — My Houses</title>
-  <meta name="description" content="Create and manage your houses in Homagio." />
-  <meta name="color-scheme" content="light dark" />
-
-  <!-- Shared CSS (relative path for GitHub Pages) -->
-  <link rel="stylesheet" href="./assets/styles.css" />
+  <meta name="description" content="Create and manage your homes in Homagio." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#07090d" />
 
   <style>
-    /* -------------------------------------------------------
-       My Houses — Dark polish to match your screenshot
-       (Overrides shared vars when user is in dark mode)
-       ------------------------------------------------------- */
-    @media (prefers-color-scheme: dark){
-      :root{
-        color-scheme: dark;
-        --bg:#07090d;
-        --bg2:#0b0f16;
-        --text:#e8eefc;
-        --muted:#b7c3da;
-        --muted2:#8ea0c5;
-        --card: rgba(12, 16, 24, .78);
-        --card2: rgba(12, 16, 24, .72);
-        --border: rgba(255,255,255,.10);
-        --border2: rgba(255,255,255,.16);
-        --shadow: 0 18px 70px rgba(0,0,0,.50);
-        --shadow2: 0 26px 90px rgba(0,0,0,.55);
-        --ring: 0 0 0 4px rgba(37,99,235,.30);
-      }
-      body{
-        background:
-          radial-gradient(1100px 660px at 18% 10%, rgba(37,99,235,.25), transparent 60%),
-          radial-gradient(900px 520px at 88% 25%, rgba(22,163,74,.18), transparent 55%),
-          linear-gradient(180deg, var(--bg), var(--bg2));
-      }
-      .nav{
-        background: rgba(8, 11, 18, .72);
-        border-bottom: 1px solid rgba(255,255,255,.10);
-      }
-      .nav a.link:hover{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.10); color: var(--text); }
-      .nav a.link.active{ background: rgba(37,99,235,.16); border-color: rgba(37,99,235,.28); }
-      .card, .card.soft, .item-card, .panel, .map-shell{
-        background: rgba(12, 16, 24, .70);
-        border-color: rgba(255,255,255,.10);
-      }
-      .input, select, textarea{
-        background: rgba(255,255,255,.06);
-        border-color: rgba(255,255,255,.12);
-        color: var(--text);
-      }
-      .btn{
-        background: rgba(255,255,255,.06);
-        border-color: rgba(255,255,255,.12);
-        color: var(--text);
-      }
-      .btn:hover{ background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); }
-      .badge{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.10); color: var(--muted); }
-      .badge.blue{ background: rgba(37,99,235,.16); border-color: rgba(37,99,235,.28); color: #bcd3ff; }
-      .kicker{ background: rgba(37,99,235,.18); border-color: rgba(37,99,235,.28); color: #bcd3ff; }
-      hr{ border-top-color: rgba(255,255,255,.10); }
+    :root{
+      color-scheme: dark;
+
+      --bg0:#07090d;
+      --bg1:#0b0f16;
+      --card0: rgba(255,255,255,.06);
+      --card1: rgba(255,255,255,.09);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.16);
+
+      --text0: rgba(255,255,255,.92);
+      --text1: rgba(255,255,255,.70);
+      --text2: rgba(255,255,255,.55);
+
+      --brand:#2d6cdf;
+      --brand2:#1f4fb0;
+
+      --radius:18px;
+      --radius2:26px;
+
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 10px 30px rgba(0,0,0,.45);
+
+      --max: 1180px;
     }
 
-    /* Layout: match screenshot proportions */
-    .dash{
-      padding: 26px 0 42px;
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(900px 500px at 20% -10%, rgba(45,108,223,.22), transparent 60%),
+        radial-gradient(900px 500px at 80% -10%, rgba(120,70,255,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color: var(--text0);
     }
-    .dash-grid{
+
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width: var(--max); margin:0 auto; padding: 20px 18px 28px; }
+
+    /* ---------- App Shell ---------- */
+    .app-header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(7,9,13,.72);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .app-header .wrap{ padding: 14px 18px; }
+    .bar{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      justify-content:space-between;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 170px;
+    }
+    .logo{
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25), transparent 40%),
+        linear-gradient(180deg, rgba(45,108,223,0.98), rgba(31,79,176,0.98));
+      box-shadow:
+        0 0 0 6px rgba(45,108,223,.22),
+        0 14px 34px rgba(0,0,0,.40);
       display:grid;
-      grid-template-columns: 1.15fr .85fr;
+      place-items:center;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .logo svg{ opacity:.96 }
+    .brand h1{
+      font-size: 14px;
+      margin:0;
+      letter-spacing:.3px;
+      line-height:1.1;
+    }
+    .brand span{
+      display:block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-top:2px;
+    }
+
+    .nav{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex-wrap: wrap;
+      justify-content:center;
+    }
+    .nav a{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      color: var(--text1);
+      font-size: 13px;
+    }
+    .nav a:hover{
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.08);
+      color: var(--text0);
+    }
+    .nav a.active{
+      background: rgba(45,108,223,.14);
+      border-color: rgba(45,108,223,.28);
+      color: rgba(255,255,255,.92);
+    }
+
+    .right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 170px;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text1);
+      font-size: 13px;
+      box-shadow: var(--shadow2);
+      white-space: nowrap;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:99px;
+      background: rgba(255,255,255,.35);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.08);
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.90);
+      font-weight: 600;
+      font-size: 13px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: var(--shadow2);
+    }
+    .btn:hover{ background: rgba(255,255,255,.09); }
+    .btn.primary{
+      border-color: rgba(45,108,223,.35);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.16), transparent 46%),
+        linear-gradient(180deg, rgba(45,108,223,.96), rgba(31,79,176,.96));
+    }
+    .btn.primary:hover{ filter: brightness(1.05); }
+
+    /* ---------- Page ---------- */
+    .page-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
       gap: 14px;
+      padding: 18px 0 12px;
+    }
+    .page-head h2{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:.2px;
+    }
+    .page-head p{
+      margin:6px 0 0;
+      color: var(--text2);
+      font-size: 13px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 16px;
       align-items:start;
     }
-    @media (max-width: 980px){
-      .dash-grid{ grid-template-columns: 1fr; }
+    @media (max-width: 960px){
+      .grid{ grid-template-columns: 1fr; }
+      .right{ display:none; }
+      .brand{ min-width:auto; }
     }
 
-    .top-actions{
+    .card{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .card .hd h3{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.25px;
+    }
+    .card .bd{ padding: 16px; }
+
+    .muted{ color: var(--text2); font-size: 13px; }
+
+    .form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form .full{ grid-column: 1 / -1; }
+
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    input, select, textarea{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: var(--text0);
+      outline:none;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(45,108,223,.55);
+      box-shadow: 0 0 0 4px rgba(45,108,223,.18);
+    }
+
+    .actions{
       display:flex;
       gap:10px;
       align-items:center;
       justify-content:flex-end;
-      flex-wrap:wrap;
+      margin-top: 12px;
+      flex-wrap: wrap;
     }
 
-    /* House list */
-    .house-row{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
-    .house-meta{
+    .list{
       display:flex;
       flex-direction:column;
-      gap:6px;
-      min-width:0;
+      gap: 10px;
     }
-    .house-title{
-      font-weight: 950;
-      letter-spacing: -.01em;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+    .house{
+      display:flex;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      align-items:flex-start;
     }
-    .house-sub{
-      color: var(--muted2);
-      font-size: 12px;
-      line-height:1.3;
-    }
-    .pill{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      padding:7px 10px;
-      border-radius:999px;
-      border:1px solid var(--border2);
-      background: rgba(255,255,255,.07);
-      font-size:12px;
-      color: var(--muted);
-      font-weight:900;
-      user-select:none;
-    }
-    .pill .dot{
-      width:10px; height:10px; border-radius:999px;
-      background: linear-gradient(180deg, var(--blue), var(--blue2));
-      box-shadow: 0 0 0 5px rgba(37,99,235,.18);
-    }
-
-    .empty{
-      padding: 14px;
+    .house:hover{ background: rgba(255,255,255,.07); }
+    .badge{
+      width: 42px;
+      height: 42px;
       border-radius: 16px;
-      border: 1px dashed rgba(255,255,255,.16);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      line-height:1.5;
+      background: rgba(45,108,223,.18);
+      border: 1px solid rgba(45,108,223,.25);
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+    }
+    .house h4{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .house .meta{
+      margin-top: 3px;
+      color: var(--text2);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .house .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .house .mini{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .chip{
+      font-size: 12px;
+      color: var(--text1);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+    }
+    .danger{
+      border-color: rgba(255,80,80,.28);
+      background: rgba(255,80,80,.10);
     }
   </style>
 </head>
 
 <body>
-  <!-- Top Nav -->
-  <div class="nav">
-    <div class="wrap nav-inner">
-      <a class="brand" href="./index.html">
-        <span class="logo-dot"></span>
-        <div style="display:flex;flex-direction:column;line-height:1.05">
-          <span style="font-weight:950">Homagio</span>
-          <span class="small" style="margin-top:2px;">Owner dashboard</span>
-        </div>
-      </a>
-
-      <div class="top-actions">
-        <a class="btn sm pill" href="./index.html">Home</a>
-        <a class="btn sm pill" href="./explore.html">Explore</a>
-        <button class="btn sm" id="btnReset">Reset</button>
-        <button class="btn sm primary" id="btnDemo">Demo Data</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="wrap dash">
-    <div class="dash-grid">
-      <!-- Left: Your homes -->
-      <div class="card pad">
-        <div class="item-top">
-          <div>
-            <div class="h3">Your homes</div>
-            <div class="small" style="margin-top:6px;">
-              Tap a home to open it. This is localStorage MVP — later we’ll swap to Firebase accounts.
-            </div>
+  <!-- App Shell Header -->
+  <header class="app-header">
+    <div class="wrap">
+      <div class="bar">
+        <a class="brand" href="index.html" aria-label="Homagio Home">
+          <div class="logo" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3l9 7v10a2 2 0 0 1-2 2h-5v-7H10v7H5a2 2 0 0 1-2-2V10l9-7z" stroke="rgba(255,255,255,.92)" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
           </div>
-          <div class="pill" title="LocalStorage MVP">
+          <div>
+            <h1>Homagio</h1>
+            <span>Manage your homes</span>
+          </div>
+        </a>
+
+        <nav class="nav" aria-label="Primary">
+          <a href="explore.html">Explore</a>
+          <a class="active" href="my.html">My Houses</a>
+        </nav>
+
+        <div class="right">
+          <div class="pill" title="Auth coming next">
             <span class="dot"></span>
-            <span>Local MVP</span>
+            Guest Mode
           </div>
+          <a class="btn primary" href="my.html">New House</a>
         </div>
-
-        <div class="sp10"></div>
-        <div class="list" id="homesList"></div>
-
-        <div class="sp10"></div>
-        <div class="empty hide" id="homesEmpty">
-          <b>No homes yet.</b><br/>
-          Create one on the right, or tap <b>Demo Data</b>.
-        </div>
-      </div>
-
-      <!-- Right: Add a new house -->
-      <div class="card pad">
-        <div class="h3">Add a new house</div>
-        <div class="small" style="margin-top:6px;">
-          Uses an address and auto-geocodes to lat/lng for Explore.
-        </div>
-
-        <form id="createForm" autocomplete="off" style="margin-top:10px;">
-          <label for="name">House name</label>
-          <input class="input" id="name" placeholder="e.g., Blair Family Home" required />
-
-          <div class="row">
-            <div>
-              <label for="style">Style</label>
-              <input class="input" id="style" placeholder="e.g., Modern, Farmhouse" />
-            </div>
-            <div>
-              <label for="tier">Tier</label>
-              <select id="tier">
-                <option value="Free">Free</option>
-                <option value="Premium">Premium</option>
-              </select>
-            </div>
-          </div>
-
-          <label for="address">Address</label>
-          <input class="input" id="address" placeholder="123 Main St, Tulsa, OK" required />
-          <div class="small" style="margin-top:6px;">Tip: include city/state for best results.</div>
-
-          <div class="row" style="margin-top:2px;">
-            <div>
-              <label for="budget">Budget (Total)</label>
-              <input class="input" id="budget" type="number" min="0" step="1" value="0" />
-            </div>
-            <div>
-              <label for="spent">Spent</label>
-              <input class="input" id="spent" type="number" min="0" step="1" value="0" />
-            </div>
-          </div>
-
-          <div class="sp10"></div>
-          <button class="btn primary block" type="submit" id="btnCreate">Create House</button>
-
-          <div class="small" style="margin-top:10px;">
-            When you open a house, you can add photos, link materials/items to photos, and track budget.
-          </div>
-        </form>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- Toasts -->
-  <div class="toast-wrap" id="toastWrap"></div>
+  <main class="wrap">
+    <div class="page-head">
+      <div>
+        <h2>My Houses</h2>
+        <p>Start a home profile, add photos, track finishes, and build a clean materials list.</p>
+      </div>
+      <div class="actions" style="margin:0;">
+        <a class="btn" href="explore.html">Open Explore</a>
+        <button class="btn primary" id="scrollToCreate">Create a house</button>
+      </div>
+    </div>
 
-  <script>
-    /* -------------------------------------------------------
-       HomagioCore (minimal, page-local)
-       ------------------------------------------------------- */
-    const HomagioCore = {
-      escapeHTML(s){
-        return String(s ?? "")
-          .replaceAll("&","&amp;")
-          .replaceAll("<","&lt;")
-          .replaceAll(">","&gt;")
-          .replaceAll('"',"&quot;")
-          .replaceAll("'","&#039;");
-      },
-      formatMoney(n){
-        const x = Number(n || 0);
-        try {
-          return new Intl.NumberFormat(undefined, { style:"currency", currency:"USD", maximumFractionDigits:0 }).format(x);
-        } catch {
-          return "$" + Math.round(x).toString();
-        }
-      },
-      toast(title, msg, kind="info", ms=2600){
-        const wrap = document.getElementById("toastWrap");
-        const el = document.createElement("div");
-        el.className = "toast " + (kind === "good" ? "good" : kind === "bad" ? "bad" : "");
-        el.innerHTML = `
-          <div class="dot"></div>
-          <div>
-            <div class="t">${HomagioCore.escapeHTML(title)}</div>
-            <div class="m">${HomagioCore.escapeHTML(msg)}</div>
+    <section class="grid">
+      <!-- Left: List -->
+      <div class="card">
+        <div class="hd">
+          <h3>Your homes</h3>
+          <div class="muted" id="countLabel">Loading…</div>
+        </div>
+        <div class="bd">
+          <div class="list" id="housesList"></div>
+          <div class="muted" id="emptyState" style="display:none; margin-top:10px;">
+            No homes yet. Create your first home on the right → then open it to add materials and photos.
           </div>
-        `;
-        wrap.appendChild(el);
-        setTimeout(() => { el.style.opacity = "0"; el.style.transform = "translateY(6px)"; }, ms);
-        setTimeout(() => { el.remove(); }, ms + 380);
-      }
-    };
+        </div>
+      </div>
 
-    /* -------------------------------------------------------
-       HomagioDB (page-local fallback)
-       - keeps working even if assets are incomplete
-       ------------------------------------------------------- */
-    const HomagioDB = (function(){
-      const KEY = "homagio.db.v1";
+      <!-- Right: Create -->
+      <div class="card" id="createCard">
+        <div class="hd">
+          <h3>Create a house</h3>
+          <div class="muted">Stored locally for now</div>
+        </div>
+        <div class="bd">
+          <form id="createForm">
+            <div class="form">
+              <div class="full">
+                <label>House name</label>
+                <input id="name" placeholder="e.g., Blair Family Home" required />
+              </div>
 
-      function uid(prefix="id"){
-        return `${prefix}-${Math.random().toString(16).slice(2)}-${Date.now().toString(16)}`;
-      }
+              <div class="full">
+                <label>Address</label>
+                <input id="address" placeholder="123 Main St, Tulsa, OK" required />
+              </div>
 
-      function read(){
-        try{
-          const raw = localStorage.getItem(KEY);
-          return raw ? JSON.parse(raw) : null;
-        }catch(e){
-          console.warn("DB read failed", e);
-          return null;
-        }
-      }
+              <div>
+                <label>Style (optional)</label>
+                <input id="style" placeholder="Modern farmhouse, Craftsman…" />
+              </div>
 
-      function write(db){
-        localStorage.setItem(KEY, JSON.stringify(db));
-      }
+              <div>
+                <label>Target budget (optional)</label>
+                <input id="budget" type="number" min="0" step="1" placeholder="250000" />
+              </div>
 
-      function ensure(){
-        let db = read();
-        if(!db){
-          db = { version: 1, houses: [] };
-          write(db);
-        }
-        if(!Array.isArray(db.houses)) db.houses = [];
-        return db;
-      }
+              <div class="full">
+                <label>Notes (optional)</label>
+                <textarea id="notes" rows="3" placeholder="Quick description or priorities…"></textarea>
+              </div>
+            </div>
 
-      function listHouses(){
-        return ensure().houses.slice();
-      }
+            <div class="actions">
+              <button class="btn" type="button" id="seedDemo">Seed demo</button>
+              <button class="btn primary" type="submit">Create house</button>
+            </div>
 
-      function getHouse(id){
-        return ensure().houses.find(h => h.id === id) || null;
-      }
+            <div class="muted" style="margin-top:10px;">
+              Next backend step: Firebase Auth + Firestore so this syncs across devices.
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
 
-      function upsertHouse(house){
-        const db = ensure();
-        const idx = db.houses.findIndex(h => h.id === house.id);
-        if(idx >= 0) db.houses[idx] = house;
-        else db.houses.unshift(house);
-        write(db);
-        return house;
-      }
+  <!-- DB + Page Logic -->
+  <script src="assets/db.js"></script>
+  <script>
+    // Lightweight page controller using HomagioDB (localStorage MVP)
+    const listEl = document.getElementById('housesList');
+    const emptyEl = document.getElementById('emptyState');
+    const countLabel = document.getElementById('countLabel');
 
-      function reset(){
-        localStorage.removeItem(KEY);
-        ensure();
-      }
+    const form = document.getElementById('createForm');
+    const btnSeed = document.getElementById('seedDemo');
+    const scrollBtn = document.getElementById('scrollToCreate');
+    const createCard = document.getElementById('createCard');
 
-      // Basic demo data near a lat/lng
-      function seedDemoNear(lat, lng, force=false){
-        const db = ensure();
-        if(!force && db.houses.length) return;
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+    }
 
-        const base = [
-          { name:"Blair Family Home", style:"Modern", tier:"Free", address:"Tulsa, OK" },
-          { name:"Lake Weekend Place", style:"Rustic", tier:"Premium", address:"Sand Springs, OK" },
-          { name:"Project Flip", style:"Farmhouse", tier:"Free", address:"Broken Arrow, OK" },
-        ];
-
-        const homes = base.map((b, i) => {
-          const dx = (Math.random() - 0.5) * 0.06;
-          const dy = (Math.random() - 0.5) * 0.06;
-          return {
-            id: uid("house"),
-            name: b.name,
-            style: b.style,
-            tier: b.tier,
-            address: b.address,
-            lat: lat + dx,
-            lng: lng + dy,
-            budgetTotal: [25000, 80000, 14000][i] || 0,
-            spent: [6400, 12000, 2200][i] || 0,
-            photos: [],
-            items: [],
-            createdAt: Date.now()
-          };
-        });
-
-        db.houses = homes.concat(db.houses);
-        write(db);
-      }
-
-      async function geocodeAddress(address){
-        // Nominatim (OpenStreetMap) — public geocoder. Light usage only.
-        const q = String(address || "").trim();
-        if(!q) throw new Error("Missing address");
-        const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(q);
-
-        const res = await fetch(url, {
-          headers: { "Accept": "application/json" }
-        });
-        if(!res.ok) throw new Error("Geocode failed (" + res.status + ")");
-        const data = await res.json();
-        if(!Array.isArray(data) || !data.length) throw new Error("No results for address");
-        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-      }
-
-      return { uid, listHouses, getHouse, upsertHouse, reset, seedDemoNear, geocodeAddress };
-    })();
-
-    /* -------------------------------------------------------
-       UI
-       ------------------------------------------------------- */
-    const DEFAULT_CENTER = { lat: 36.15398, lng: -95.99277 }; // Tulsa fallback
-
-    function renderHomes(){
-      const list = document.getElementById("homesList");
-      const empty = document.getElementById("homesEmpty");
-      list.innerHTML = "";
-
-      const homes = HomagioDB.listHouses();
+    function render(){
+      const homes = (HomagioDB.getHomes && HomagioDB.getHomes()) || [];
+      countLabel.textContent = `${homes.length} total`;
+      listEl.innerHTML = '';
 
       if(!homes.length){
-        empty.classList.remove("hide");
+        emptyEl.style.display = 'block';
         return;
       }
-      empty.classList.add("hide");
+      emptyEl.style.display = 'none';
 
-      homes.forEach(h => {
-        const card = document.createElement("div");
-        card.className = "item-card";
+      for(const h of homes){
+        const name = escapeHtml(h.name || 'Untitled');
+        const addr = escapeHtml(h.address || '');
+        const style = escapeHtml(h.style || '');
+        const budget = h.budget ? `$${Number(h.budget).toLocaleString()}` : '';
 
-        const budget = HomagioCore.formatMoney(h.budgetTotal || 0);
-        const spent = HomagioCore.formatMoney(h.spent || 0);
-
-        card.innerHTML = `
-          <div class="house-row">
-            <div class="house-meta">
-              <div class="house-title">${HomagioCore.escapeHTML(h.name || "House")}</div>
-              <div class="house-sub">
-                ${HomagioCore.escapeHTML(h.address || "No address")}
-                ${typeof h.lat === "number" && typeof h.lng === "number" ? " • pinned" : ""}
-              </div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;">
-                <span class="badge">Style: <b style="margin-left:6px;">${HomagioCore.escapeHTML(h.style || "—")}</b></span>
-                <span class="badge blue">Tier: <b style="margin-left:6px;">${HomagioCore.escapeHTML(h.tier || "Free")}</b></span>
-              </div>
-              <div class="small" style="margin-top:8px;">
-                Budget: <b>${budget}</b> • Spent: <b>${spent}</b>
-              </div>
+        const el = document.createElement('a');
+        el.className = 'house';
+        el.href = `house.html?id=${encodeURIComponent(h.id)}`;
+        el.innerHTML = `
+          <div class="badge" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3l9 7v10a2 2 0 0 1-2 2h-5v-7H10v7H5a2 2 0 0 1-2-2V10l9-7z"
+                stroke="rgba(255,255,255,.88)" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div style="flex:1;">
+            <div class="row">
+              <h4>${name}</h4>
+              <span class="muted">Open →</span>
             </div>
-
-            <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap:wrap;">
-              <a class="btn sm" href="./house.html?id=${encodeURIComponent(h.id)}">Open</a>
+            <div class="meta">${addr}</div>
+            <div class="mini">
+              ${style ? `<span class="chip">${style}</span>` : ''}
+              ${budget ? `<span class="chip">${budget}</span>` : ''}
+              <span class="chip">Local</span>
             </div>
           </div>
         `;
-
-        // whole card click opens
-        card.addEventListener("click", () => {
-          window.location.href = "./house.html?id=" + encodeURIComponent(h.id);
-        });
-
-        list.appendChild(card);
-      });
+        listEl.appendChild(el);
+      }
     }
 
-    async function handleCreate(e){
+    // Address -> Lat/Lng using free Nominatim (no key)
+    async function geocode(address){
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+      const res = await fetch(url, { headers: { 'Accept':'application/json' }});
+      const data = await res.json();
+      if(!data || !data.length) return null;
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    }
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById("name").value.trim();
-      const style = document.getElementById("style").value.trim();
-      const tier = document.getElementById("tier").value;
-      const address = document.getElementById("address").value.trim();
+      const name = document.getElementById('name').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const style = document.getElementById('style').value.trim();
+      const budget = document.getElementById('budget').value.trim();
+      const notes = document.getElementById('notes').value.trim();
 
-      const budgetTotal = Number(document.getElementById("budget").value || 0);
-      const spent = Number(document.getElementById("spent").value || 0);
-
-      if(!name){
-        HomagioCore.toast("Missing name", "Please enter a house name.", "bad");
-        return;
-      }
-      if(!address){
-        HomagioCore.toast("Missing address", "Please enter an address.", "bad");
-        return;
-      }
-
-      const btn = document.getElementById("btnCreate");
+      const btn = form.querySelector('button[type="submit"]');
+      const old = btn.textContent;
+      btn.textContent = 'Creating…';
       btn.disabled = true;
-      btn.textContent = "Creating…";
 
-      let latlng = null;
       try{
-        latlng = await HomagioDB.geocodeAddress(address);
-      }catch(err){
-        console.warn(err);
-        // fallback: still create house, but place near Tulsa center
-        latlng = {
-          lat: DEFAULT_CENTER.lat + (Math.random()-0.5)*0.04,
-          lng: DEFAULT_CENTER.lng + (Math.random()-0.5)*0.04
+        const geo = await geocode(address);
+        const lat = geo ? geo.lat : null;
+        const lng = geo ? geo.lng : null;
+
+        const home = {
+          name,
+          address,
+          style,
+          budget: budget ? Number(budget) : null,
+          notes,
+          lat,
+          lng,
+          createdAt: Date.now()
         };
-        HomagioCore.toast("Geocode fallback", "Couldn’t geocode that address. Placed it near Tulsa for now.", "info", 3600);
+
+        const id = HomagioDB.addHome ? HomagioDB.addHome(home) : null;
+        render();
+
+        // Go straight to the house page
+        if(id){
+          window.location.href = `house.html?id=${encodeURIComponent(id)}`;
+        }else{
+          alert('Created, but could not navigate (DB function missing).');
+        }
+      }catch(err){
+        console.error(err);
+        alert('Could not create house. Check console for details.');
+      }finally{
+        btn.textContent = old;
+        btn.disabled = false;
       }
-
-      const house = {
-        id: HomagioDB.uid("house"),
-        name,
-        style,
-        tier,
-        address,
-        lat: latlng.lat,
-        lng: latlng.lng,
-        budgetTotal: Math.max(0, budgetTotal),
-        spent: Math.max(0, spent),
-        photos: [],
-        items: [],
-        createdAt: Date.now()
-      };
-
-      HomagioDB.upsertHouse(house);
-      HomagioCore.toast("House created", "Added “" + name + "”.", "good");
-
-      // Reset form
-      document.getElementById("createForm").reset();
-      document.getElementById("budget").value = "0";
-      document.getElementById("spent").value = "0";
-      document.getElementById("tier").value = "Free";
-
-      renderHomes();
-
-      btn.disabled = false;
-      btn.textContent = "Create House";
-    }
-
-    function handleReset(){
-      const ok = confirm("Reset Homagio local data? This clears all houses, photos, and items on this device.");
-      if(!ok) return;
-      HomagioDB.reset();
-      HomagioCore.toast("Reset complete", "Local data cleared.", "good");
-      renderHomes();
-    }
-
-    function handleDemo(){
-      HomagioDB.seedDemoNear(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng, true);
-      HomagioCore.toast("Demo loaded", "Sample homes added.", "good");
-      renderHomes();
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("createForm").addEventListener("submit", handleCreate);
-      document.getElementById("btnReset").addEventListener("click", handleReset);
-      document.getElementById("btnDemo").addEventListener("click", handleDemo);
-
-      renderHomes();
     });
+
+    btnSeed.addEventListener('click', () => {
+      // Seed demo around Tulsa-ish if DB provides it; otherwise safe no-op
+      try{
+        if(HomagioDB.seedDemoNear){
+          HomagioDB.seedDemoNear(36.1540, -95.9928, true);
+        }else if(HomagioDB.seedDemo){
+          HomagioDB.seedDemo(true);
+        }
+      }catch(e){}
+      render();
+    });
+
+    scrollBtn.addEventListener('click', () => {
+      createCard.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+
+    render();
   </script>
 </body>
 </html>
