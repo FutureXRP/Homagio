@@ -4,11 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Homagio — Explore</title>
-  <meta name="description" content="Explore nearby homes around you in real time." />
-  <meta name="color-scheme" content="light dark" />
-
-  <!-- ✅ IMPORTANT: RELATIVE PATHS for GitHub Pages (/Homagio/) -->
-  <link rel="stylesheet" href="./assets/styles.css" />
+  <meta name="description" content="Explore homes around you in Homagio." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#07090d" />
 
   <!-- Leaflet -->
   <link
@@ -21,511 +19,598 @@
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
-    defer
   ></script>
 
-  <!-- Shared JS -->
-  <script defer src="./assets/core.js"></script>
-  <script defer src="./assets/db.js"></script>
-
   <style>
-    /* Explore-specific polish */
-    .topbar-actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid rgba(15,23,42,.14);
-      background: rgba(255,255,255,.92);
-      font-weight:800;
-      font-size:12px;
-      color: var(--muted);
-      user-select:none;
-    }
-    .pill b{color: var(--text)}
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: rgba(100,116,139,.45);
-      box-shadow: 0 0 0 5px rgba(100,116,139,.12);
-    }
-    .dot.on{
-      background: linear-gradient(180deg, var(--blue), var(--blue2));
-      box-shadow: 0 0 0 5px rgba(37,99,235,.14);
-    }
-    .range{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      width:100%;
-    }
-    .range input[type="range"]{width: 220px; max-width: 60vw}
-    .range .val{
-      min-width: 64px;
-      text-align:right;
-      font-weight:900;
-      color: var(--text);
-    }
-    .empty{
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px dashed rgba(15,23,42,.18);
-      background: rgba(2,6,23,.02);
-      color: var(--muted);
-      line-height:1.5;
+    :root{
+      color-scheme: dark;
+
+      --bg0:#07090d;
+      --bg1:#0b0f16;
+      --card0: rgba(255,255,255,.06);
+      --card1: rgba(255,255,255,.09);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.16);
+
+      --text0: rgba(255,255,255,.92);
+      --text1: rgba(255,255,255,.70);
+      --text2: rgba(255,255,255,.55);
+
+      --brand:#2d6cdf;
+      --brand2:#1f4fb0;
+
+      --radius:18px;
+      --radius2:26px;
+
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 10px 30px rgba(0,0,0,.45);
+
+      --max: 1180px;
     }
 
-    /* Zillow-ish marker label */
-    .price-pin{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(15,23,42,.18);
-      background: rgba(255,255,255,.96);
-      box-shadow: 0 12px 26px rgba(2,6,23,.14);
-      font-weight: 900;
-      color: var(--text);
-      transform: translateY(-8px);
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(900px 500px at 20% -10%, rgba(45,108,223,.22), transparent 60%),
+        radial-gradient(900px 500px at 80% -10%, rgba(120,70,255,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color: var(--text0);
+    }
+    a{ color:inherit; text-decoration:none; }
+
+    .wrap{ max-width: var(--max); margin:0 auto; padding: 20px 18px 28px; }
+
+    /* ---------- App Shell Header ---------- */
+    .app-header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(7,9,13,.72);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .app-header .wrap{ padding: 14px 18px; }
+    .bar{ display:flex; align-items:center; gap:14px; justify-content:space-between; }
+    .brand{ display:flex; align-items:center; gap:10px; min-width:170px; }
+    .logo{
+      width: 38px; height: 38px; border-radius: 14px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25), transparent 40%),
+        linear-gradient(180deg, rgba(45,108,223,0.98), rgba(31,79,176,0.98));
+      box-shadow: 0 0 0 6px rgba(45,108,223,.22), 0 14px 34px rgba(0,0,0,.40);
+      display:grid; place-items:center;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .brand h1{ font-size:14px; margin:0; letter-spacing:.3px; line-height:1.1; }
+    .brand span{ display:block; font-size:12px; color:var(--text2); margin-top:2px; }
+
+    .nav{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; }
+    .nav a{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      color: var(--text1);
+      font-size: 13px;
+    }
+    .nav a:hover{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.08); color: var(--text0); }
+    .nav a.active{ background: rgba(45,108,223,.14); border-color: rgba(45,108,223,.28); color: rgba(255,255,255,.92); }
+
+    .right{ display:flex; align-items:center; gap:10px; min-width:170px; justify-content:flex-end; }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 10px 12px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text1);
+      font-size: 13px;
+      box-shadow: var(--shadow2);
       white-space:nowrap;
     }
-    .price-pin .mini{
-      width:10px;height:10px;border-radius:999px;
-      background: linear-gradient(180deg, var(--blue), var(--blue2));
-      box-shadow: 0 0 0 5px rgba(37,99,235,.12);
+    .dot{ width:8px; height:8px; border-radius:99px; background: rgba(255,255,255,.35); box-shadow: 0 0 0 4px rgba(255,255,255,.08); }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 12px 14px; border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.90);
+      font-weight: 600; font-size:13px;
+      cursor:pointer; user-select:none;
+      box-shadow: var(--shadow2);
+      white-space:nowrap;
     }
-    .price-pin.sel{
-      border-color: rgba(37,99,235,.28);
-      box-shadow: 0 14px 30px rgba(37,99,235,.18);
+    .btn:hover{ background: rgba(255,255,255,.09); }
+    .btn.primary{
+      border-color: rgba(45,108,223,.35);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.16), transparent 46%),
+        linear-gradient(180deg, rgba(45,108,223,.96), rgba(31,79,176,.96));
+    }
+    .btn.primary:hover{ filter: brightness(1.05); }
+
+    @media (max-width: 960px){
+      .right{ display:none; }
+      .brand{ min-width:auto; }
     }
 
-    /* Guarantee map height */
-    #map{ height: 560px; }
-    @media (max-width: 980px){ #map{ height: 420px; } }
+    /* ---------- Explore Layout ---------- */
+    .page-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 18px 0 12px;
+    }
+    .page-head h2{ margin:0; font-size:22px; letter-spacing:.2px; }
+    .page-head p{ margin:6px 0 0; color: var(--text2); font-size:13px; }
+
+    .shell{
+      display:grid;
+      grid-template-columns: 1.35fr .65fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    @media (max-width: 980px){
+      .shell{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .card .hd h3{ margin:0; font-size:14px; letter-spacing:.25px; }
+    .card .bd{ padding: 14px; }
+
+    .map-wrap{ height: 560px; }
+    @media (max-width: 980px){ .map-wrap{ height: 440px; } }
+
+    #map{
+      width:100%;
+      height:100%;
+      border-radius: calc(var(--radius2) - 6px);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+    .controls label{
+      font-size: 12px;
+      color: var(--text2);
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .controls input{
+      width: 90px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: var(--text0);
+      outline:none;
+    }
+    .controls input:focus{
+      border-color: rgba(45,108,223,.55);
+      box-shadow: 0 0 0 4px rgba(45,108,223,.18);
+    }
+
+    .panel{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .item{
+      display:block;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+    }
+    .item:hover{ background: rgba(255,255,255,.07); }
+    .item .t{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .item h4{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .meta{
+      margin-top: 4px;
+      color: var(--text2);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .chiprow{ display:flex; gap:8px; flex-wrap:wrap; margin-top: 8px; }
+    .chip{
+      font-size: 12px;
+      color: var(--text1);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+    }
+
+    .muted{ color: var(--text2); font-size: 13px; }
+
+    /* Marker icon */
+    .house-pin {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.25), transparent 40%),
+        linear-gradient(180deg, rgba(45, 108, 223, 0.95), rgba(31, 79, 176, 0.95));
+      display: grid;
+      place-items: center;
+      box-shadow:
+        0 0 0 6px rgba(45, 108, 223, 0.25),
+        0 14px 34px rgba(0, 0, 0, 0.35);
+    }
+    .house-pin svg { opacity: 0.95; }
   </style>
 </head>
 
 <body>
-  <!-- Top Nav -->
-  <div class="nav">
-    <div class="wrap nav-inner">
-      <a class="brand" href="./index.html">
-        <span class="logo-dot"></span>
-        <span>Homagio</span>
-      </a>
+  <!-- App Shell Header -->
+  <header class="app-header">
+    <div class="wrap">
+      <div class="bar">
+        <a class="brand" href="index.html" aria-label="Homagio Home">
+          <div class="logo" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3l9 7v10a2 2 0 0 1-2 2h-5v-7H10v7H5a2 2 0 0 1-2-2V10l9-7z" stroke="rgba(255,255,255,.92)" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <h1>Homagio</h1>
+            <span>Explore homes</span>
+          </div>
+        </a>
 
-      <div class="nav-links">
-        <a class="link" href="./index.html">Home</a>
-        <a class="link" href="./my.html">My Houses</a>
-        <a class="link active" href="./explore.html">Explore</a>
-      </div>
+        <nav class="nav" aria-label="Primary">
+          <a class="active" href="explore.html">Explore</a>
+          <a href="my.html">My Houses</a>
+        </nav>
 
-      <div class="topbar-actions">
-        <div class="pill" id="gpsPill">
-          <span class="dot" id="gpsDot"></span>
-          <span>GPS:</span> <b id="gpsTxt">off</b>
+        <div class="right">
+          <div class="pill" title="Auth coming next">
+            <span class="dot"></span>
+            Guest Mode
+          </div>
+          <a class="btn primary" href="my.html">Create House</a>
         </div>
-        <button class="btn sm" id="btnGPS">Toggle GPS</button>
-        <button class="btn sm" id="btnRecenter">Recenter</button>
-        <button class="btn sm" id="btnDemo">Demo</button>
       </div>
     </div>
-  </div>
+  </header>
 
-  <div class="wrap section" style="padding-top:18px;">
-    <div class="row" style="align-items:flex-start;">
+  <main class="wrap">
+    <div class="page-head">
       <div>
-        <div class="kicker">Explore</div>
-        <div class="sp10"></div>
-        <h1 class="h2">Homes near you</h1>
-        <div class="sp10"></div>
-        <p class="p">Browse houses within your radius. Tap a marker or a home card to see details and linked items.</p>
+        <h2>Explore</h2>
+        <p>Find homes and jump into materials + links. (Map style is intentionally lighter so pins pop.)</p>
       </div>
-
-      <div class="card soft pad" style="max-width: 420px;">
-        <div class="h3">Radius</div>
-        <div class="sp10"></div>
-        <div class="range">
-          <input id="radius" type="range" min="0.5" max="20" step="0.5" value="2" />
-          <div class="val"><span id="radiusVal">2.0</span> mi</div>
-        </div>
-        <div class="sp10"></div>
-        <div class="small">Tip: If you see “No homes found,” hit <b>Demo</b> to seed sample homes near the map center.</div>
+      <div class="controls">
+        <label>
+          Radius (mi)
+          <input id="radius" type="number" min="0.2" step="0.2" value="2.0" />
+        </label>
+        <button class="btn" id="locateBtn" type="button">Use my location</button>
+        <button class="btn" id="seedBtn" type="button">Seed demo</button>
       </div>
     </div>
 
-    <div class="sp18"></div>
-
-    <div class="split">
-      <div class="map-shell">
-        <div id="map"></div>
-      </div>
-
-      <div class="panel">
-        <div class="tabs">
-          <div class="tab" id="tabHomes" data-on="1">Homes</div>
-          <div class="tab" id="tabLinks" data-on="0">Links</div>
+    <section class="shell">
+      <!-- Map -->
+      <div class="card">
+        <div class="hd">
+          <h3>Map</h3>
+          <div class="muted" id="status">Ready</div>
         </div>
-
-        <div class="panel-b" id="panelHomes">
-          <div class="small muted2" style="margin-bottom:10px;">
-            Nearby homes. Tap a card or marker to select. Open full details from the card.
-          </div>
-          <div class="list" id="homesList"></div>
-          <div class="sp14"></div>
-          <div class="empty hide" id="homesEmpty">
-            <b>No homes found in range.</b><br/>
-            Increase radius or click <b>Demo</b> to load sample homes.
-          </div>
-        </div>
-
-        <div class="panel-b hide" id="panelLinks">
-          <div class="small muted2" style="margin-bottom:10px;">
-            Links for the selected home (materials, items, purchase links).
-          </div>
-          <div class="empty" id="linksEmpty">
-            <b>No home selected.</b><br/>
-            Select a home to see its linked items.
-          </div>
-          <div class="list hide" id="linksList"></div>
+        <div class="bd map-wrap">
+          <div id="map" role="application" aria-label="Homagio map"></div>
         </div>
       </div>
-    </div>
-  </div>
 
+      <!-- Side Panel -->
+      <aside class="panel">
+        <div class="card">
+          <div class="hd">
+            <h3>Homes</h3>
+            <div class="muted" id="count">0</div>
+          </div>
+          <div class="bd">
+            <div class="list" id="homesList"></div>
+            <div class="muted" id="empty" style="display:none;">
+              No homes found in range. Try a bigger radius, seed demo, or create a house in “My Houses”.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <h3>Links</h3>
+            <div class="muted" id="linksHint">Select a home</div>
+          </div>
+          <div class="bd">
+            <div class="list" id="linksList"></div>
+            <div class="muted" id="linksEmpty" style="display:none;">
+              No links for this home yet. Open it → add materials with purchase links.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="assets/db.js"></script>
   <script>
-    (function () {
-      const DEFAULT = { lat: 36.15398, lng: -95.99277, zoom: 12 }; // Tulsa-ish fallback
-      const state = {
-        map: null,
-        center: { ...DEFAULT },
-        gpsOn: false,
-        radiusMi: 2.0,
-        markers: new Map(),
-        selectedHouseId: null,
-      };
+    // ----- Map Defaults
+    const DEFAULT = { lat: 36.1540, lng: -95.9928, zoom: 12 }; // Tulsa
+    let map, markerLayer, radiusCircle;
+    let center = { ...DEFAULT };
+    let currentRadiusMi = 2.0;
 
-      const $ = (id) => document.getElementById(id);
+    const statusEl = document.getElementById('status');
+    const radiusEl = document.getElementById('radius');
+    const listEl = document.getElementById('homesList');
+    const emptyEl = document.getElementById('empty');
+    const countEl = document.getElementById('count');
 
-      const el = {
-        btnGPS: $("btnGPS"),
-        btnRecenter: $("btnRecenter"),
-        btnDemo: $("btnDemo"),
-        gpsDot: $("gpsDot"),
-        gpsTxt: $("gpsTxt"),
-        radius: $("radius"),
-        radiusVal: $("radiusVal"),
-        homesList: $("homesList"),
-        homesEmpty: $("homesEmpty"),
-        linksEmpty: $("linksEmpty"),
-        linksList: $("linksList"),
-        tabHomes: $("tabHomes"),
-        tabLinks: $("tabLinks"),
-        panelHomes: $("panelHomes"),
-        panelLinks: $("panelLinks"),
-      };
+    const linksList = document.getElementById('linksList');
+    const linksEmpty = document.getElementById('linksEmpty');
+    const linksHint = document.getElementById('linksHint');
 
-      function setTab(which) {
-        const homesOn = which === "homes";
-        el.tabHomes.dataset.on = homesOn ? "1" : "0";
-        el.tabLinks.dataset.on = homesOn ? "0" : "1";
-        el.panelHomes.classList.toggle("hide", !homesOn);
-        el.panelLinks.classList.toggle("hide", homesOn);
-      }
+    function setStatus(t){ statusEl.textContent = t; }
 
-      function setGPSUI(on) {
-        el.gpsTxt.textContent = on ? "on" : "off";
-        el.gpsDot.classList.toggle("on", !!on);
-      }
-
-      function haversineMi(a, b) {
-        const R = 3958.8; // miles
-        const toRad = (d) => d * Math.PI / 180;
-        const dLat = toRad(b.lat - a.lat);
-        const dLon = toRad(b.lng - a.lng);
-        const lat1 = toRad(a.lat);
-        const lat2 = toRad(b.lat);
-        const x = Math.sin(dLat / 2) ** 2 +
-                  Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-        const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
-        return R * c;
-      }
-
-      function getVisibleHouses() {
-        const all = (window.HomagioDB?.listHouses?.() || []);
-        return all
-          .filter(h => typeof h.lat === "number" && typeof h.lng === "number")
-          .map(h => ({
-            ...h,
-            distMi: haversineMi(state.center, { lat: h.lat, lng: h.lng })
-          }))
-          .filter(h => h.distMi <= state.radiusMi)
-          .sort((a,b) => a.distMi - b.distMi);
-      }
-
-      function markerIcon(houseId, label, selected) {
-        return L.divIcon({
-          className: "",
-          html: `<div class="price-pin ${selected ? "sel" : ""}">
-                  <span class="mini"></span>
-                  <span>${label}</span>
-                </div>`,
-          iconSize: [1, 1],
-          iconAnchor: [0, 0]
-        });
-      }
-
-      function selectHouse(houseId, { pan = true, openPopup = true } = {}) {
-        state.selectedHouseId = houseId;
-        setTab("links");
-        render();
-
-        const house = window.HomagioDB?.getHouse?.(houseId);
-        if (!house) return;
-
-        if (pan && state.map) state.map.panTo([house.lat, house.lng], { animate: true });
-        if (openPopup) {
-          const mk = state.markers.get(houseId);
-          if (mk) mk.openPopup();
-        }
-      }
-
-      function renderHomesPanel(houses) {
-        el.homesList.innerHTML = "";
-        if (!houses.length) {
-          el.homesEmpty.classList.remove("hide");
-          return;
-        }
-        el.homesEmpty.classList.add("hide");
-
-        for (const h of houses) {
-          const div = document.createElement("div");
-          div.className = "item-card";
-          div.innerHTML = `
-            <div class="item-top">
-              <div>
-                <div class="item-title">${HomagioCore.escapeHTML(h.name || "House")}</div>
-                <div class="item-sub">
-                  ${(h.address ? HomagioCore.escapeHTML(h.address) : "No address")}
-                  • ${h.distMi.toFixed(1)} mi
-                </div>
-              </div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-                <a class="btn sm" href="./house.html?id=${encodeURIComponent(h.id)}">Open</a>
-                <button class="btn sm primary" data-sel="${h.id}">Select</button>
-              </div>
-            </div>
-          `;
-          div.querySelector('button[data-sel]')?.addEventListener("click", () => selectHouse(h.id));
-          div.addEventListener("dblclick", () => selectHouse(h.id));
-          el.homesList.appendChild(div);
-        }
-      }
-
-      function renderLinksPanel() {
-        const id = state.selectedHouseId;
-        const house = id ? window.HomagioDB?.getHouse?.(id) : null;
-
-        if (!house) {
-          el.linksList.classList.add("hide");
-          el.linksEmpty.classList.remove("hide");
-          return;
-        }
-
-        const items = Array.isArray(house.items) ? house.items : [];
-        const photos = Array.isArray(house.photos) ? house.photos : [];
-        const photoById = new Map(photos.map(p => [p.id, p]));
-        const linked = items.filter(it => (it.link && String(it.link).trim().length > 0));
-
-        el.linksList.innerHTML = "";
-
-        if (!linked.length) {
-          el.linksList.classList.add("hide");
-          el.linksEmpty.classList.remove("hide");
-          el.linksEmpty.innerHTML = `
-            <b>No linked items yet.</b><br/>
-            Open this home and add items with purchase links.
-            <div class="sp10"></div>
-            <a class="btn sm primary" href="./house.html?id=${encodeURIComponent(house.id)}">Open ${HomagioCore.escapeHTML(house.name || "House")}</a>
-          `;
-          return;
-        }
-
-        el.linksEmpty.classList.add("hide");
-        el.linksList.classList.remove("hide");
-
-        for (const it of linked) {
-          const p = it.photoId ? photoById.get(it.photoId) : null;
-
-          const card = document.createElement("div");
-          card.className = "item-card";
-          card.innerHTML = `
-            <div class="item-top">
-              <div>
-                <div class="item-title">${HomagioCore.escapeHTML(it.title || "Item")}</div>
-                <div class="item-sub">
-                  ${(it.category ? HomagioCore.escapeHTML(it.category) : "Uncategorized")}
-                </div>
-              </div>
-              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-                <span class="badge">${HomagioCore.formatMoney(it.price || 0)}</span>
-                <a class="btn sm primary" href="${HomagioCore.escapeHTML(it.link)}" target="_blank" rel="noopener noreferrer">Open link</a>
-              </div>
-            </div>
-
-            ${p && p.url ? `
-              <div class="sp10"></div>
-              <div class="row" style="gap:10px;">
-                <div style="flex:0 0 110px;">
-                  <img src="${HomagioCore.escapeHTML(p.url)}" alt=""
-                    style="width:110px;height:76px;object-fit:cover;border-radius:12px;border:1px solid rgba(15,23,42,.12);" />
-                </div>
-                <div class="small muted2">Linked photo</div>
-              </div>
-            ` : ``}
-          `;
-          el.linksList.appendChild(card);
-        }
-      }
-
-      function renderMarkers(houses) {
-        if (!state.map) return;
-        for (const mk of state.markers.values()) state.map.removeLayer(mk);
-        state.markers.clear();
-
-        for (const h of houses) {
-          const selected = h.id === state.selectedHouseId;
-          const label = (h.distMi <= 0.05) ? "Here" : `${h.distMi.toFixed(1)} mi`;
-
-          const mk = L.marker([h.lat, h.lng], {
-            icon: markerIcon(h.id, label, selected),
-            keyboard: false
-          });
-
-          mk.on("click", () => selectHouse(h.id, { pan: false, openPopup: true }));
-
-          mk.bindPopup(`
-            <div style="min-width:220px;">
-              <div style="font-weight:900; margin-bottom:4px;">${HomagioCore.escapeHTML(h.name || "House")}</div>
-              <div style="color:#475569; font-size:12px; margin-bottom:10px;">
-                ${(h.address ? HomagioCore.escapeHTML(h.address) : "No address")}
-                • ${h.distMi.toFixed(1)} mi
-              </div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <a class="btn sm" href="./house.html?id=${encodeURIComponent(h.id)}">Open</a>
-                <button class="btn sm primary" onclick="(function(){ try{ window.__homagioSelect && window.__homagioSelect('${h.id}'); }catch(e){} })()">Select</button>
-              </div>
-            </div>
-          `);
-
-          mk.addTo(state.map);
-          state.markers.set(h.id, mk);
-        }
-      }
-
-      function render() {
-        const houses = getVisibleHouses();
-        renderHomesPanel(houses);
-        renderMarkers(houses);
-        renderLinksPanel();
-      }
-
-      function initMap() {
-        if (!window.L) { setTimeout(initMap, 50); return; }
-
-        state.map = L.map("map", { zoomControl: true, preferCanvas: true });
-
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-          maxZoom: 19,
-          attribution: "&copy; OpenStreetMap &copy; CARTO"
-        }).addTo(state.map);
-
-        state.map.setView([state.center.lat, state.center.lng], DEFAULT.zoom);
-
-        window.__homagioSelect = (id) => selectHouse(id);
-        render();
-      }
-
-      function recenter() {
-        if (!state.map) return;
-        state.map.setView([state.center.lat, state.center.lng], DEFAULT.zoom, { animate: true });
-        render();
-      }
-
-      function enableGPS(on) {
-        state.gpsOn = !!on;
-        setGPSUI(state.gpsOn);
-
-        if (!state.gpsOn) {
-          HomagioCore.toast("GPS off", "Using map center instead of your device location.", "info", 2200);
-          return;
-        }
-
-        if (!navigator.geolocation) {
-          state.gpsOn = false;
-          setGPSUI(false);
-          HomagioCore.toast("GPS unavailable", "Your browser/device does not support geolocation.", "bad", 3000);
-          return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            state.center = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            HomagioCore.toast("GPS on", "Centered on your current location.", "good", 2200);
-            recenter();
-          },
-          () => {
-            state.gpsOn = false;
-            setGPSUI(false);
-            HomagioCore.toast("GPS blocked", "Allow location access to use GPS mode.", "bad", 3200);
-          },
-          { enableHighAccuracy: true, timeout: 9000, maximumAge: 5000 }
-        );
-      }
-
-      function seedDemo() {
-        const fn = window.HomagioDB?.seedDemoNear;
-        if (typeof fn !== "function") {
-          HomagioCore.toast("Demo unavailable", "HomagioDB.seedDemoNear not found.", "bad", 3200);
-          return;
-        }
-        fn(state.center.lat, state.center.lng, true);
-        HomagioCore.toast("Demo homes loaded", "Sample homes added near your center.", "good", 2400);
-        setTab("homes");
-        render();
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        state.radiusMi = parseFloat(el.radius.value || "2") || 2.0;
-        el.radiusVal.textContent = state.radiusMi.toFixed(1);
-
-        el.radius.addEventListener("input", () => {
-          state.radiusMi = parseFloat(el.radius.value || "2") || 2.0;
-          el.radiusVal.textContent = state.radiusMi.toFixed(1);
-          render();
-        });
-
-        el.tabHomes.addEventListener("click", () => setTab("homes"));
-        el.tabLinks.addEventListener("click", () => setTab("links"));
-
-        el.btnGPS.addEventListener("click", () => enableGPS(!state.gpsOn));
-        el.btnRecenter.addEventListener("click", () => recenter());
-        el.btnDemo.addEventListener("click", () => seedDemo());
-
-        setGPSUI(false);
-        setTab("homes");
-        initMap();
+    function pinIcon(){
+      return L.divIcon({
+        className: '',
+        html: `
+          <div class="house-pin" title="Home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3l9 7v10a2 2 0 0 1-2 2h-5v-7H10v7H5a2 2 0 0 1-2-2V10l9-7z"
+                stroke="rgba(255,255,255,.92)" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        `,
+        iconSize: [38,38],
+        iconAnchor: [19,19]
       });
-    })();
+    }
+
+    function safeInvalidate(){
+      try{ map && map.invalidateSize(); }catch(e){}
+    }
+
+    function milesToMeters(mi){ return mi * 1609.344; }
+
+    function getHomes(){
+      return (HomagioDB.getHomes && HomagioDB.getHomes()) || [];
+    }
+
+    function distMiles(a, b){
+      // haversine
+      const R = 3958.8;
+      const toRad = d => d * Math.PI / 180;
+      const dLat = toRad(b.lat - a.lat);
+      const dLng = toRad(b.lng - a.lng);
+      const lat1 = toRad(a.lat);
+      const lat2 = toRad(b.lat);
+      const h = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+      return 2 * R * Math.asin(Math.sqrt(h));
+    }
+
+    function withinRadius(h){
+      if(h.lat == null || h.lng == null) return false;
+      return distMiles(center, {lat:h.lat, lng:h.lng}) <= currentRadiusMi;
+    }
+
+    function clearLinks(){
+      linksList.innerHTML = '';
+      linksEmpty.style.display = 'none';
+      linksHint.textContent = 'Select a home';
+    }
+
+    function renderLinksForHome(homeId){
+      linksList.innerHTML = '';
+      linksEmpty.style.display = 'none';
+
+      // Try to read items/materials if DB supports it; otherwise show empty
+      let links = [];
+      try{
+        if(HomagioDB.getItemsForHome){
+          const items = HomagioDB.getItemsForHome(homeId) || [];
+          links = items
+            .filter(i => i.link)
+            .map(i => ({ title: i.name || i.title || 'Item', url: i.link }));
+        }
+      }catch(e){}
+
+      if(!links.length){
+        linksEmpty.style.display = 'block';
+        linksHint.textContent = 'No links yet';
+        return;
+      }
+
+      linksHint.textContent = `${links.length} links`;
+      for(const l of links){
+        const a = document.createElement('a');
+        a.className = 'item';
+        a.href = l.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.innerHTML = `
+          <div class="t">
+            <h4>${escapeHtml(l.title)}</h4>
+            <span class="muted">Open ↗</span>
+          </div>
+          <div class="meta">${escapeHtml(l.url)}</div>
+        `;
+        linksList.appendChild(a);
+      }
+    }
+
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+    }
+
+    function render(){
+      const homes = getHomes().filter(withinRadius);
+      countEl.textContent = String(homes.length);
+      listEl.innerHTML = '';
+      markerLayer.clearLayers();
+      clearLinks();
+
+      if(radiusCircle){
+        radiusCircle.setLatLng([center.lat, center.lng]);
+        radiusCircle.setRadius(milesToMeters(currentRadiusMi));
+      }
+
+      if(!homes.length){
+        emptyEl.style.display = 'block';
+        return;
+      }
+      emptyEl.style.display = 'none';
+
+      for(const h of homes){
+        const m = L.marker([h.lat, h.lng], { icon: pinIcon() }).addTo(markerLayer);
+        m.on('click', () => {
+          linksHint.textContent = 'Loading…';
+          renderLinksForHome(h.id);
+        });
+
+        const el = document.createElement('a');
+        el.className = 'item';
+        el.href = `house.html?id=${encodeURIComponent(h.id)}`;
+        el.innerHTML = `
+          <div class="t">
+            <h4>${escapeHtml(h.name || 'Untitled')}</h4>
+            <span class="muted">Open →</span>
+          </div>
+          <div class="meta">${escapeHtml(h.address || '')}</div>
+          <div class="chiprow">
+            ${h.style ? `<span class="chip">${escapeHtml(h.style)}</span>` : ''}
+            <span class="chip">${(distMiles(center, {lat:h.lat, lng:h.lng})).toFixed(1)} mi</span>
+          </div>
+        `;
+        el.addEventListener('mouseenter', () => {
+          // Preview links without navigating
+          linksHint.textContent = 'Preview…';
+          renderLinksForHome(h.id);
+        });
+        listEl.appendChild(el);
+      }
+    }
+
+    function setRadius(mi){
+      currentRadiusMi = Math.max(0.2, Number(mi || 2.0));
+      render();
+    }
+
+    async function init(){
+      setStatus('Loading map…');
+
+      map = L.map('map', { zoomControl: true });
+
+      // Lighter map so pins/labels are visible (no dark tiles)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      markerLayer = L.layerGroup().addTo(map);
+
+      map.setView([DEFAULT.lat, DEFAULT.lng], DEFAULT.zoom);
+
+      radiusCircle = L.circle([DEFAULT.lat, DEFAULT.lng], {
+        radius: milesToMeters(currentRadiusMi),
+        color: 'rgba(45,108,223,.85)',
+        weight: 2,
+        fillColor: 'rgba(45,108,223,.20)',
+        fillOpacity: 0.35
+      }).addTo(map);
+
+      window.addEventListener('resize', safeInvalidate);
+      setStatus('Ready');
+
+      // Seed demo near default for instant content if DB supports it
+      try{
+        if(HomagioDB.seedDemoNear){
+          HomagioDB.seedDemoNear(DEFAULT.lat, DEFAULT.lng, false);
+        }
+      }catch(e){}
+
+      setRadius(Number(radiusEl.value));
+      safeInvalidate();
+    }
+
+    document.getElementById('seedBtn').addEventListener('click', () => {
+      try{
+        if(HomagioDB.seedDemoNear){
+          HomagioDB.seedDemoNear(center.lat, center.lng, true);
+        }
+      }catch(e){}
+      render();
+    });
+
+    document.getElementById('locateBtn').addEventListener('click', () => {
+      if(!navigator.geolocation){
+        alert('Geolocation not supported in this browser.');
+        return;
+      }
+      setStatus('Locating…');
+      navigator.geolocation.getCurrentPosition((pos) => {
+        center = { lat: pos.coords.latitude, lng: pos.coords.longitude, zoom: 13 };
+        map.setView([center.lat, center.lng], center.zoom);
+        setStatus('Using your location');
+        render();
+      }, (err) => {
+        console.warn(err);
+        setStatus('Location unavailable (using default)');
+        alert('Could not get your location. Using default map center.');
+      }, { enableHighAccuracy: true, timeout: 8000 });
+    });
+
+    radiusEl.addEventListener('change', () => setRadius(radiusEl.value));
+    radiusEl.addEventListener('input', () => setRadius(radiusEl.value));
+
+    init();
   </script>
 </body>
 </html>
